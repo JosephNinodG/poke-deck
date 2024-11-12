@@ -31,7 +31,7 @@ func main() {
 
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
-	go startHTTPServer(cancelFunc, appname)
+	go startHTTPServer(ctx, cancelFunc, appname)
 
 	termChan := make(chan os.Signal, 1)
 	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
