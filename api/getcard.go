@@ -37,6 +37,8 @@ func GetCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	slog.InfoContext(ctx, fmt.Sprintf("Request received for card: %v", req.CardID))
+
 	response, err := tcgapi.GetCard(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -53,4 +55,5 @@ func GetCard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	slog.InfoContext(ctx, "Response returned successfully", "CardID", req.CardID)
 }
