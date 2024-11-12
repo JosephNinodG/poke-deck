@@ -27,7 +27,7 @@ func main() {
 
 	appname := "poke-deck"
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	slog.InfoContext(ctx, "App starting", "App name", appname)
+	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
