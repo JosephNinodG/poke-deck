@@ -9,7 +9,7 @@ import (
 )
 
 func GetCard(GetCardRequest model.GetCardRequest) (*pokemontcgv2.PokemonCard, error) {
-	card, err := client.GetCardByID(GetCardRequest.CardID)
+	card, err := client.GetCardByID(GetCardRequest.Id)
 	//TODO: Handle specific response codes
 
 	if err != nil {
@@ -17,6 +17,21 @@ func GetCard(GetCardRequest model.GetCardRequest) (*pokemontcgv2.PokemonCard, er
 	}
 
 	return card, nil
+}
+
+func GetCardById(Id string) (model.PokemonCard, error) {
+	card, err := client.GetCardByID(Id)
+	if err != nil {
+		return model.PokemonCard{}, err
+	}
+
+	if card == nil {
+		return model.PokemonCard{}, nil
+	}
+
+	pokemonCard := model.PokemonCard(*card)
+
+	return pokemonCard, nil
 }
 
 // Example GetCards func

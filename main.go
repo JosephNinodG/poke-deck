@@ -58,6 +58,7 @@ func startHTTPServer(ctx context.Context, cancelFunc context.CancelFunc, appname
 	})
 
 	http.HandleFunc("/"+appname+"/getcard", api.GetCard)
+	http.HandleFunc("/"+appname+"/getcardbyid", api.GetCardById)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), nil); err != nil {
 		if !errors.Is(err, http.ErrServerClosed) {
