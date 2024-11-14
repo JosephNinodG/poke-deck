@@ -13,6 +13,7 @@ import (
 
 func GetCard(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	endpointName := "GetCard"
 
 	var req model.GetCardRequest
 
@@ -21,7 +22,7 @@ func GetCard(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		_, err := w.Write([]byte(fmt.Sprintf("HTTP method not allowed on route. Expected %v", http.MethodGet)))
 		if err != nil {
-			slog.ErrorContext(ctx, "error writing to HTTP response body", "error", err)
+			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
 		}
 		return
 	}
@@ -37,12 +38,12 @@ func GetCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.InfoContext(ctx, fmt.Sprintf("Request received for CardID: %v", req.CardID))
+	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "request", req)
 
 	response, err := tcgapi.GetCard(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "error getting specified card", "error", err, "CardID", req.CardID)
+		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "request", req, "error", err)
 		return
 	}
 
@@ -50,9 +51,9 @@ func GetCard(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "error encoding response body", "error", err)
+		slog.ErrorContext(ctx, "error encoding response body", "endpoint", endpointName, "error", err)
 		return
 	}
 
-	slog.InfoContext(ctx, "Response returned successfully", "CardID", req.CardID)
+	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "request", req)
 }
