@@ -11,11 +11,11 @@ import (
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
-func GetCard(w http.ResponseWriter, r *http.Request) {
+func GetCards(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	endpointName := "GetCard"
 
-	var req model.GetCardRequest
+	var req model.GetCardsRequest
 
 	if strings.ToUpper(r.Method) != http.MethodGet {
 		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodGet, "actual", r.Method)
@@ -38,9 +38,20 @@ func GetCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	valid, message := req.Validate()
+	if !valid {
+		slog.ErrorContext(ctx, "request is invalid", "endpoint", endpointName, "request", req)
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte(message))
+		if err != nil {
+			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
+		}
+		return
+	}
+
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "request", req)
 
-	response, err := tcgapi.GetCard(req)
+	response, err := tcgapi.GetCards(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "request", req, "error", err)
