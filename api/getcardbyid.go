@@ -8,13 +8,12 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/JosephNinodG/poke-deck/model"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
 func GetCardById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	Id := r.URL.Query().Get("id")
+	id := r.URL.Query().Get("id")
 	endpointName := "GetCardById"
 
 	if strings.ToUpper(r.Method) != http.MethodGet {
@@ -27,23 +26,22 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	valid, message := model.ValidateCard(Id)
-	if !valid {
+	if id == "" {
 		slog.ErrorContext(ctx, "no Id provided in query param", "endpoint", endpointName)
 		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte(message))
+		_, err := w.Write([]byte("missing id in request"))
 		if err != nil {
 			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
 		}
 		return
 	}
 
-	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "cardId", Id)
+	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "cardId", id)
 
-	response, err := tcgapi.GetCardById(Id)
+	response, err := tcgapi.GetCardById(id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "cardId", Id, "error", err)
+		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "cardId", id, "error", err)
 		return
 	}
 
@@ -64,5 +62,5 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "cardId", Id)
+	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "cardId", id)
 }
