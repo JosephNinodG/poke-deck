@@ -19,7 +19,9 @@ var tcgapikey string
 
 func TestMain(m *testing.M) {
 	ctx := context.Background()
-	tcgapi.SetUpClient(ctx, tcgapikey)
+	Configure(tcgapi.StubTcgApiHandler{})
+
+	tcgapi.SetUpStubRepository(ctx, tcgapikey)
 
 	m.Run()
 }
@@ -32,7 +34,7 @@ func Test_GetCardById(t *testing.T) {
 		httpMethod            string
 		expectedStatusCode    int
 		expectedErrorResponse string
-		expectedResponse      model.PokemonCard
+		expectedCardId        string
 	}{
 		{
 			name:                  "Error - Incorrect http method",
@@ -66,6 +68,15 @@ func Test_GetCardById(t *testing.T) {
 			expectedStatusCode:    http.StatusNotFound,
 			expectedErrorResponse: "no card matching that Id",
 		},
+		{
+			name:                  "Success - Retreived card for given Id",
+			id:                    "test-ID-1",
+			queryParam:            "id",
+			httpMethod:            http.MethodGet,
+			expectedStatusCode:    http.StatusOK,
+			expectedErrorResponse: "",
+			expectedCardId:        "test-ID-1",
+		},
 	}
 
 	for _, test := range tests {
@@ -92,7 +103,7 @@ func Test_GetCardById(t *testing.T) {
 				}
 
 				if test.expectedErrorResponse != response {
-					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedResponse, response)
+					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedErrorResponse, response)
 				}
 			}
 
@@ -104,8 +115,8 @@ func Test_GetCardById(t *testing.T) {
 					t.Fatalf("error decoding json body: %v", err)
 				}
 
-				if !reflect.DeepEqual(test.expectedResponse, response) {
-					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedResponse, response)
+				if !reflect.DeepEqual(test.expectedCardId, response.ID) {
+					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedCardId, response.ID)
 				}
 			}
 
@@ -121,7 +132,7 @@ func Test_GetCards(t *testing.T) {
 		httpMethod            string
 		expectedStatusCode    int
 		expectedErrorResponse string
-		expectedResponse      model.PokemonCard
+		expectedCardId        string
 	}{
 		{
 			name: "Error - Incorrect http method",
@@ -149,6 +160,10 @@ func Test_GetCards(t *testing.T) {
 			expectedStatusCode:    http.StatusMethodNotAllowed,
 			expectedErrorResponse: "HTTP method not allowed on route. Expected GET",
 		},
+		//TODO: Implement Successful - Retrieved card for given params
+		//TODO: Implement Successful - Retrieved multiple cards for given params
+		//TODO: Implement No Cards found for given params
+		//TODO: Implement tests for OrderBy and MaxCards
 	}
 
 	for _, test := range tests {
@@ -175,7 +190,7 @@ func Test_GetCards(t *testing.T) {
 				}
 
 				if test.expectedErrorResponse != response {
-					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedResponse, response)
+					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedErrorResponse, response)
 				}
 			}
 
@@ -187,8 +202,8 @@ func Test_GetCards(t *testing.T) {
 					t.Fatalf("error decoding json body: %v", err)
 				}
 
-				if !reflect.DeepEqual(test.expectedResponse, response) {
-					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedResponse, response)
+				if !reflect.DeepEqual(test.expectedCardId, response.ID) {
+					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedCardId, response.ID)
 				}
 			}
 
