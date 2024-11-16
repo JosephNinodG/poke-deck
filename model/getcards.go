@@ -17,12 +17,6 @@ type Card struct {
 	Legalities Legalities `json:"legalities"`
 }
 
-type Legalities struct {
-	Standard  string `json:"standard"`
-	Expanded  string `json:"expanded"`
-	Unlimited string `json:"unlimited"`
-}
-
 type Parameters struct {
 	MaxCards int    `json:"maxCards"`
 	OrderBy  string `json:"orderBy"`

@@ -112,3 +112,17 @@ type PokemonCard struct {
 		} `json:"prices"`
 	} `json:"cardmarket"`
 }
+
+type Legalities struct {
+	Standard  string `json:"standard"`
+	Expanded  string `json:"expanded"`
+	Unlimited string `json:"unlimited"`
+}
+
+type Attack struct {
+	Name                string   `json:"name"`
+	Cost                []string `json:"cost"`
+	ConvertedEnergyCost int      `json:"convertedEnergyCost"`
+	Damage              string   `json:"damage"`
+	Text                string   `json:"text"`
+}
