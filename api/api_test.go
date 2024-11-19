@@ -93,7 +93,7 @@ func Test_GetCardById(t *testing.T) {
 			}()
 
 			if res.StatusCode != test.expectedStatusCode {
-				t.Fatalf("expected\n%v\nactual\n%v", res.StatusCode, test.expectedStatusCode)
+				t.Fatalf("expected\n%v\nactual\n%v", test.expectedStatusCode, res.StatusCode)
 			}
 
 			if test.expectedErrorResponse != "" {
@@ -128,7 +128,6 @@ func Test_GetCards(t *testing.T) {
 	tests := []struct {
 		name                  string
 		request               model.GetCardsRequest
-		queryParam            string
 		httpMethod            string
 		expectedStatusCode    int
 		expectedErrorResponse string
@@ -155,7 +154,6 @@ func Test_GetCards(t *testing.T) {
 					OrderBy:  "name",
 				},
 			},
-			queryParam:            "id",
 			httpMethod:            http.MethodDelete,
 			expectedStatusCode:    http.StatusMethodNotAllowed,
 			expectedErrorResponse: "HTTP method not allowed on route. Expected GET",
@@ -168,7 +166,7 @@ func Test_GetCards(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			req := httptest.NewRequest(test.httpMethod, "/getcards", nil)
+			req := httptest.NewRequest(test.httpMethod, "/getcards", test.request)
 			w := httptest.NewRecorder()
 			GetCards(w, req)
 			res := w.Result()
@@ -180,7 +178,7 @@ func Test_GetCards(t *testing.T) {
 			}()
 
 			if res.StatusCode != test.expectedStatusCode {
-				t.Fatalf("expected\n%v\nactual\n%v", res.StatusCode, test.expectedStatusCode)
+				t.Fatalf("expected\n%v\nactual\n%v", test.expectedStatusCode, res.StatusCode)
 			}
 
 			if test.expectedErrorResponse != "" {
