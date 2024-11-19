@@ -158,7 +158,27 @@ func Test_GetCards(t *testing.T) {
 			expectedStatusCode:    http.StatusMethodNotAllowed,
 			expectedErrorResponse: "HTTP method not allowed on route. Expected GET",
 		},
-		//TODO: Implement Successful - Retrieved card for given params
+		{
+			name: "Successful - Retrieved card",
+			request: model.GetCardsRequest{
+				Card: model.Card{
+					Name:      "test-name-1",
+					Type:      "test-type-1",
+					Supertype: "test-supertype",
+					Subtype:   "test-subtype-1",
+					Set:       "test-set",
+					Attack:    "test-attack1",
+					Legalities: model.Legalities{
+						Standard:  "legal",
+						Expanded:  "legal",
+						Unlimited: "legal",
+					},
+				},
+			},
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     "test-id-1",
+		},
 		//TODO: Implement Successful - Retrieved multiple cards for given params
 		//TODO: Implement No Cards found for given params
 		//TODO: Implement tests for OrderBy and MaxCards
