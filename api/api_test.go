@@ -126,59 +126,82 @@ func Test_GetCardById(t *testing.T) {
 
 func Test_GetCards(t *testing.T) {
 	tests := []struct {
-		name                  string
-		request               model.GetCardsRequest
+		name string
+		//request               model.GetCardsRequest
+		request               []byte
 		httpMethod            string
 		expectedStatusCode    int
 		expectedErrorResponse string
 		expectedCardId        string
 	}{
 		{
-			name: "Error - Incorrect http method",
-			request: model.GetCardsRequest{
-				Card: model.Card{
-					Name:      "test-name",
-					Type:      "test-type",
-					Supertype: "test-supertype",
-					Subtype:   "test-subtype",
-					Set:       "test-set",
-					Attack:    "test-attack",
-					Legalities: model.Legalities{
-						Standard:  "legal",
-						Expanded:  "legal",
-						Unlimited: "legal",
-					},
-				},
-				Paramters: model.Parameters{
-					MaxCards: 1,
-					OrderBy:  "name",
-				},
-			},
+			name:    "Error - Incorrect http method",
+			request: []byte(`{"card":{"name":"test-name","type":"test-type","supertype":"test-supertype","subtype":"test-subtype","set":"test-set","attack":"test-attack","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"maxCards":1,"orderBy":"name"}}`),
+			// request: model.GetCardsRequest{
+			// 	Card: model.Card{
+			// 		Name:      "test-name",
+			// 		Type:      "test-type",
+			// 		Supertype: "test-supertype",
+			// 		Subtype:   "test-subtype",
+			// 		Set:       "test-set",
+			// 		Attack:    "test-attack",
+			// 		Legalities: model.Legalities{
+			// 			Standard:  "legal",
+			// 			Expanded:  "legal",
+			// 			Unlimited: "legal",
+			// 		},
+			// 	},
+			// 	Paramters: model.Parameters{
+			// 		MaxCards: 1,
+			// 		OrderBy:  "name",
+			// 	},
+			// },
 			httpMethod:            http.MethodDelete,
 			expectedStatusCode:    http.StatusMethodNotAllowed,
 			expectedErrorResponse: "HTTP method not allowed on route. Expected GET",
 		},
 		{
-			name: "Successful - Retrieved card",
-			request: model.GetCardsRequest{
-				Card: model.Card{
-					Name:      "test-name-1",
-					Type:      "test-type-1",
-					Supertype: "test-supertype",
-					Subtype:   "test-subtype-1",
-					Set:       "test-set",
-					Attack:    "test-attack1",
-					Legalities: model.Legalities{
-						Standard:  "legal",
-						Expanded:  "legal",
-						Unlimited: "legal",
-					},
-				},
-			},
+			name:    "Successful - Retrieved card",
+			request: []byte(`{"card":{"name":"test-name-1","type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype1","set":"test-set","attack":"test-attack1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"maxCards":1,"orderBy":"name"}}`),
+			// request: model.GetCardsRequest{
+			// 	Card: model.Card{
+			// 		Name:      "test-name-1",
+			// 		Type:      "test-type-1",
+			// 		Supertype: "test-supertype",
+			// 		Subtype:   "test-subtype-1",
+			// 		Set:       "test-set",
+			// 		Attack:    "test-attack1",
+			// 		Legalities: model.Legalities{
+			// 			Standard:  "legal",
+			// 			Expanded:  "legal",
+			// 			Unlimited: "legal",
+			// 		},
+			// 	},
+			// },
 			httpMethod:         http.MethodGet,
 			expectedStatusCode: http.StatusOK,
 			expectedCardId:     "test-id-1",
 		},
+		// {
+		// 	name: "Successful - Retrieved mulitple cards",
+		// 	request: model.GetCardsRequest{
+		// 		Card: model.Card{
+		// 			Type:      "test-type-1",
+		// 			Supertype: "test-supertype",
+		// 			Subtype:   "test-subtype-1",
+		// 			Set:       "test-set",
+		// 			Attack:    "test-attack1",
+		// 			Legalities: model.Legalities{
+		// 				Standard:  "legal",
+		// 				Expanded:  "legal",
+		// 				Unlimited: "legal",
+		// 			},
+		// 		},
+		// 	},
+		// 	httpMethod:         http.MethodGet,
+		// 	expectedStatusCode: http.StatusOK,
+		// 	expectedCardId:     "test-id-1",
+		// },
 		//TODO: Implement Successful - Retrieved multiple cards for given params
 		//TODO: Implement No Cards found for given params
 		//TODO: Implement tests for OrderBy and MaxCards
@@ -186,7 +209,7 @@ func Test_GetCards(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			req := httptest.NewRequest(test.httpMethod, "/getcards", test.request)
+			req := httptest.NewRequest(test.httpMethod, "/getcards", bytes.NewBuffer(test.request))
 			w := httptest.NewRecorder()
 			GetCards(w, req)
 			res := w.Result()

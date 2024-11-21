@@ -13,6 +13,7 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := r.URL.Query().Get("id")
 	endpointName := "GetCardById"
+	enableCors(&w)
 
 	if strings.ToUpper(r.Method) != http.MethodGet {
 		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodGet, "actual", r.Method)

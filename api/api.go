@@ -1,6 +1,10 @@
 package api
 
-import "github.com/JosephNinodG/poke-deck/handler"
+import (
+	"net/http"
+
+	"github.com/JosephNinodG/poke-deck/handler"
+)
 
 var cardHandler handler.CardHandler
 
@@ -9,4 +13,8 @@ func Configure(cardHandlerOverride handler.CardHandler) {
 		panic("cardHandler instance already set")
 	}
 	cardHandler = cardHandlerOverride
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }

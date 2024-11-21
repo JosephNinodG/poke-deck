@@ -3,6 +3,7 @@ package tcgapi
 import (
 	"context"
 	"log/slog"
+	"sort"
 
 	"github.com/JosephNinodG/poke-deck/model"
 )
@@ -40,8 +41,36 @@ func (t StubTcgApiHandler) GetCards(req model.GetCardsRequest) ([]model.PokemonC
 		}
 	}
 
-	//TODO: Implement MaxCards
-	//TODO: Implement OrderBy
+	switch req.Paramters.OrderBy {
+	case "name":
+		sort.SliceStable(cardList, func(i, j int) bool {
+			return cardList[i].Name < cardList[j].Name
+		})
+	case "number":
+		sort.SliceStable(cardList, func(i, j int) bool {
+			return cardList[i].Number < cardList[j].Number
+		})
+	case "set":
+		sort.SliceStable(cardList, func(i, j int) bool {
+			return cardList[i].Set.Name < cardList[j].Set.Name
+		})
+	default:
+	}
+
+	if req.Paramters.Desc {
+		sort.SliceStable(cardList, func(i, j int) bool {
+			return i > j
+		})
+	}
+
+	if len(cardList) > req.Paramters.MaxCards {
+		trimmedList := []model.PokemonCard{}
+		for i := 0; i < req.Paramters.MaxCards; i++ {
+			trimmedList = append(trimmedList, cardList[i])
+		}
+
+		cardList = trimmedList
+	}
 
 	return cardList, nil
 }
