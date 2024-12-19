@@ -7,6 +7,17 @@ import (
 	"github.com/PokemonTCG/pokemon-tcg-sdk-go-v2/pkg/request"
 )
 
+//TODO: May have to build entire new api wrapper to handle requests instead of relying on sdk
+// struct provided by sdk is missing legalities.standard and legalities.expanded
+// func GetCardByLegality(queryParams string) {
+// 	ctx := context.Background()
+// 	requestURL := fmt.Sprintf("https://api.pokemontcg.io/v2/cards%v", queryParams)
+// 	res, err := http.Get(requestURL)
+// 	if err != nil {
+// 		slog.ErrorContext(ctx, err.Error())
+// 	}
+// }
+
 func GetCardById(id string) (model.PokemonCard, error) {
 	card, err := client.GetCardByID(id)
 	if err != nil {

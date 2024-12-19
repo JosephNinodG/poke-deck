@@ -17,12 +17,6 @@ type Card struct {
 	Legalities Legalities `json:"legalities"`
 }
 
-type Legalities struct {
-	Standard  string `json:"standard"`
-	Expanded  string `json:"expanded"`
-	Unlimited string `json:"unlimited"`
-}
-
 type Parameters struct {
 	MaxCards int    `json:"maxCards"`
 	OrderBy  string `json:"orderBy"`
@@ -54,7 +48,7 @@ func (r GetCardsRequest) Validate() (bool, string) {
 		}
 	}
 
-	if r.Paramters.MaxCards < 0 && r.Paramters.MaxCards > 250 {
+	if r.Paramters.MaxCards < 0 || r.Paramters.MaxCards > 250 { //This can be 0 as the tcgapi sets a default of 0 to 250
 		return false, "invalid value provided for maximum number of cards to return. Must be between 0 - 250"
 	}
 

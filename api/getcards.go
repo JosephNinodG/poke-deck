@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/JosephNinodG/poke-deck/model"
-	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
 func GetCards(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +40,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 	valid, message := req.Validate()
 	if !valid {
 		slog.ErrorContext(ctx, "request is invalid", "endpoint", endpointName, "request", req)
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest) //TODO: Change to 204
 		_, err := w.Write([]byte(message))
 		if err != nil {
 			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
@@ -51,7 +50,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "request", req)
 
-	response, err := tcgapi.GetCards(req)
+	response, err := cardHandler.GetCards(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "request", req, "error", err)

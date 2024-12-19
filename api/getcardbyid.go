@@ -7,14 +7,13 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-
-	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
 func GetCardById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := r.URL.Query().Get("id")
 	endpointName := "GetCardById"
+	enableCors(&w)
 
 	if strings.ToUpper(r.Method) != http.MethodGet {
 		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodGet, "actual", r.Method)
@@ -28,7 +27,7 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 
 	if id == "" {
 		slog.ErrorContext(ctx, "no Id provided in query param", "endpoint", endpointName)
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest) //TODO: Change to 204
 		_, err := w.Write([]byte("missing id in request"))
 		if err != nil {
 			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
@@ -38,7 +37,7 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "cardId", id)
 
-	response, err := tcgapi.GetCardById(id)
+	response, err := cardHandler.GetCardById(id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "cardId", id, "error", err)

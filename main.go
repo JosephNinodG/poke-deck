@@ -12,6 +12,7 @@ import (
 	"syscall"
 
 	"github.com/JosephNinodG/poke-deck/api"
+	"github.com/JosephNinodG/poke-deck/handler"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
@@ -29,6 +30,7 @@ func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
+	api.Configure(handler.TcgApiHandler{})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
 	go startHTTPServer(ctx, cancelFunc, appname)
