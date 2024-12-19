@@ -132,79 +132,64 @@ func Test_GetCards(t *testing.T) {
 		httpMethod            string
 		expectedStatusCode    int
 		expectedErrorResponse string
-		expectedCardId        string
+		expectedCardId        []string
 	}{
 		{
-			name:    "Error - Incorrect http method",
-			request: []byte(`{"card":{"name":"test-name","type":"test-type","supertype":"test-supertype","subtype":"test-subtype","set":"test-set","attack":"test-attack","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"maxCards":1,"orderBy":"name"}}`),
-			// request: model.GetCardsRequest{
-			// 	Card: model.Card{
-			// 		Name:      "test-name",
-			// 		Type:      "test-type",
-			// 		Supertype: "test-supertype",
-			// 		Subtype:   "test-subtype",
-			// 		Set:       "test-set",
-			// 		Attack:    "test-attack",
-			// 		Legalities: model.Legalities{
-			// 			Standard:  "legal",
-			// 			Expanded:  "legal",
-			// 			Unlimited: "legal",
-			// 		},
-			// 	},
-			// 	Paramters: model.Parameters{
-			// 		MaxCards: 1,
-			// 		OrderBy:  "name",
-			// 	},
-			// },
+			name:                  "Error - Incorrect http method",
+			request:               []byte(`{"card":{"name":"test-name","type":"test-type","supertype":"test-supertype","subtype":"test-subtype","set":"test-set","attack":"test-attack","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}}`),
 			httpMethod:            http.MethodDelete,
 			expectedStatusCode:    http.StatusMethodNotAllowed,
 			expectedErrorResponse: "HTTP method not allowed on route. Expected GET",
 		},
 		{
-			name:    "Successful - Retrieved card",
-			request: []byte(`{"card":{"name":"test-name-1","type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype1","set":"test-set","attack":"test-attack1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"maxCards":1,"orderBy":"name"}}`),
-			// request: model.GetCardsRequest{
-			// 	Card: model.Card{
-			// 		Name:      "test-name-1",
-			// 		Type:      "test-type-1",
-			// 		Supertype: "test-supertype",
-			// 		Subtype:   "test-subtype-1",
-			// 		Set:       "test-set",
-			// 		Attack:    "test-attack1",
-			// 		Legalities: model.Legalities{
-			// 			Standard:  "legal",
-			// 			Expanded:  "legal",
-			// 			Unlimited: "legal",
-			// 		},
-			// 	},
-			// },
+			name:               "Successful - Retrieved card",
+			request:            []byte(`{"card":{"name":"test-name-1","type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype-1","set":"test-set","attack":"test-attack-1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}}`),
 			httpMethod:         http.MethodGet,
 			expectedStatusCode: http.StatusOK,
-			expectedCardId:     "test-id-1",
+			expectedCardId:     []string{"test-ID-1"},
 		},
-		// {
-		// 	name: "Successful - Retrieved mulitple cards",
-		// 	request: model.GetCardsRequest{
-		// 		Card: model.Card{
-		// 			Type:      "test-type-1",
-		// 			Supertype: "test-supertype",
-		// 			Subtype:   "test-subtype-1",
-		// 			Set:       "test-set",
-		// 			Attack:    "test-attack1",
-		// 			Legalities: model.Legalities{
-		// 				Standard:  "legal",
-		// 				Expanded:  "legal",
-		// 				Unlimited: "legal",
-		// 			},
-		// 		},
-		// 	},
-		// 	httpMethod:         http.MethodGet,
-		// 	expectedStatusCode: http.StatusOK,
-		// 	expectedCardId:     "test-id-1",
-		// },
-		//TODO: Implement Successful - Retrieved multiple cards for given params
-		//TODO: Implement No Cards found for given params
-		//TODO: Implement tests for OrderBy and MaxCards
+		{
+			name:               "Successful - Retrieved mulitple cards",
+			request:            []byte(`{"card":{"type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype-1","set":"test-set","attack":"test-attack-1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}}`),
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     []string{"test-ID-1", "test-ID-2"},
+		},
+		{
+			name:               "Successful - No cards for given params",
+			request:            []byte(`{"card":{"type":"test-type-false","supertype":"test-supertype","subtype":"test-subtype-false","set":"test-set","attack":"test-attack-false","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}}`),
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     []string{},
+		},
+		{
+			name:               "Successful - Valid request for multiple cards but filtered by MaxCards",
+			request:            []byte(`{"card":{"type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype-1","set":"test-set","attack":"test-attack-1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"maxCards":1}}`),
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     []string{"test-ID-1"},
+		},
+		{
+			name:               "Successful - Retrieved mulitple cards and ordered using OrderBy = number",
+			request:            []byte(`{"card":{"type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype-1","set":"test-set","attack":"test-attack-1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"orderby":"number"}}`),
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     []string{"test-ID-2", "test-ID-1"}, //50, 100
+		},
+		{
+			name:               "Successful - Retrieved mulitple cards and ordered using OrderBy = number - desc",
+			request:            []byte(`{"card":{"type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype-1","set":"test-set","attack":"test-attack-1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"orderby":"number", "desc": true}}`),
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     []string{"test-ID-1", "test-ID-2"}, //100, 50
+		},
+		{
+			name:               "Successful - Retrieved mulitple cards and ordered using OrderBy = name - desc",
+			request:            []byte(`{"card":{"type":"test-type-1","supertype":"test-supertype","subtype":"test-subtype-1","set":"test-set","attack":"test-attack-1","legalities":{"standard":"legal","expanded":"legal","unlimited":"legal"}}, "parameters":{"orderby":"name", "desc": true}}`),
+			httpMethod:         http.MethodGet,
+			expectedStatusCode: http.StatusOK,
+			expectedCardId:     []string{"test-ID-2", "test-ID-1"},
+		},
 	}
 
 	for _, test := range tests {
@@ -221,7 +206,7 @@ func Test_GetCards(t *testing.T) {
 			}()
 
 			if res.StatusCode != test.expectedStatusCode {
-				t.Fatalf("expected\n%v\nactual\n%v", test.expectedStatusCode, res.StatusCode)
+				t.Errorf("expected\n%v\nactual\n%v", test.expectedStatusCode, res.StatusCode)
 			}
 
 			if test.expectedErrorResponse != "" {
@@ -236,15 +221,17 @@ func Test_GetCards(t *testing.T) {
 			}
 
 			if test.expectedStatusCode == http.StatusOK {
-				var response model.PokemonCard
+				var response []model.PokemonCard
 
 				err := json.NewDecoder(res.Body).Decode(&response)
 				if err != nil {
 					t.Fatalf("error decoding json body: %v", err)
 				}
 
-				if !reflect.DeepEqual(test.expectedCardId, response.ID) {
-					t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedCardId, response.ID)
+				for i, card := range response {
+					if !reflect.DeepEqual(test.expectedCardId[i], card.ID) {
+						t.Fatalf("\nexpected\n%v\nactual\n%v", test.expectedCardId[i], card.ID)
+					}
 				}
 			}
 

@@ -48,7 +48,7 @@ func (t StubTcgApiHandler) GetCards(req model.GetCardsRequest) ([]model.PokemonC
 		})
 	case "number":
 		sort.SliceStable(cardList, func(i, j int) bool {
-			return cardList[i].Number < cardList[j].Number
+			return cardList[i].Number > cardList[j].Number
 		})
 	case "set":
 		sort.SliceStable(cardList, func(i, j int) bool {
@@ -61,6 +61,10 @@ func (t StubTcgApiHandler) GetCards(req model.GetCardsRequest) ([]model.PokemonC
 		sort.SliceStable(cardList, func(i, j int) bool {
 			return i > j
 		})
+	}
+
+	if req.Paramters.MaxCards == 0 {
+		req.Paramters.MaxCards = 250
 	}
 
 	if len(cardList) > req.Paramters.MaxCards {
@@ -140,10 +144,10 @@ var stubPokemonCards = []model.PokemonCard{
 		ID:          "test-ID-1",
 		Name:        "test-name-1",
 		Supertype:   "test-supertype",
-		Subtypes:    []string{"test-subtype1", "test-subtype2"},
+		Subtypes:    []string{"test-subtype-1", "test-subtype-2"},
 		Level:       "",
 		Hp:          "",
-		Types:       []string{"test-type1", "test-type2"},
+		Types:       []string{"test-type-1", "test-type-2"},
 		EvolvesFrom: "",
 		EvolvesTo:   []string{},
 		Rules:       []string{},
@@ -162,7 +166,7 @@ var stubPokemonCards = []model.PokemonCard{
 			ConvertedEnergyCost int      "json:\"convertedEnergyCost\""
 			Damage              string   "json:\"damage\""
 			Text                string   "json:\"text\""
-		}{{Name: "test-attack1"}, {Name: "test-attack2"}},
+		}{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
 		Weaknesses: []struct {
 			Type  string "json:\"type\""
 			Value string "json:\"value\""
@@ -190,7 +194,7 @@ var stubPokemonCards = []model.PokemonCard{
 				Logo   string "json:\"logo\""
 			} "json:\"images\""
 		}{Name: "test-set"},
-		Number:                 "",
+		Number:                 "100",
 		Artist:                 "",
 		Rarity:                 "",
 		FlavorText:             "",
@@ -252,10 +256,10 @@ var stubPokemonCards = []model.PokemonCard{
 		ID:          "test-ID-2",
 		Name:        "test-name-2",
 		Supertype:   "test-supertype",
-		Subtypes:    []string{"test-subtype1", "test-subtype2"},
+		Subtypes:    []string{"test-subtype-1", "test-subtype-2"},
 		Level:       "",
 		Hp:          "",
-		Types:       []string{"test-type1", "test-type2"},
+		Types:       []string{"test-type-1", "test-type-2"},
 		EvolvesFrom: "",
 		EvolvesTo:   []string{},
 		Rules:       []string{},
@@ -274,7 +278,7 @@ var stubPokemonCards = []model.PokemonCard{
 			ConvertedEnergyCost int      "json:\"convertedEnergyCost\""
 			Damage              string   "json:\"damage\""
 			Text                string   "json:\"text\""
-		}{{Name: "test-attack1"}, {Name: "test-attack2"}},
+		}{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
 		Weaknesses: []struct {
 			Type  string "json:\"type\""
 			Value string "json:\"value\""
@@ -302,7 +306,7 @@ var stubPokemonCards = []model.PokemonCard{
 				Logo   string "json:\"logo\""
 			} "json:\"images\""
 		}{Name: "test-set"},
-		Number:                 "",
+		Number:                 "50",
 		Artist:                 "",
 		Rarity:                 "",
 		FlavorText:             "",
@@ -386,7 +390,7 @@ var stubPokemonCards = []model.PokemonCard{
 			ConvertedEnergyCost int      "json:\"convertedEnergyCost\""
 			Damage              string   "json:\"damage\""
 			Text                string   "json:\"text\""
-		}{{Name: "test-attack1"}, {Name: "test-attack2"}},
+		}{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
 		Weaknesses: []struct {
 			Type  string "json:\"type\""
 			Value string "json:\"value\""
@@ -414,7 +418,7 @@ var stubPokemonCards = []model.PokemonCard{
 				Logo   string "json:\"logo\""
 			} "json:\"images\""
 		}{Name: "test-set"},
-		Number:                 "",
+		Number:                 "1",
 		Artist:                 "",
 		Rarity:                 "",
 		FlavorText:             "",
