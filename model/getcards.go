@@ -48,8 +48,8 @@ func (r GetCardsRequest) Validate() (bool, string) {
 		}
 	}
 
-	if r.Paramters.MaxCards < 1 && r.Paramters.MaxCards > 250 {
-		return false, "invalid value provided for maximum number of cards to return. Must be between 1 - 250"
+	if r.Paramters.MaxCards < 0 || r.Paramters.MaxCards > 250 { //This can be 0 as the tcgapi sets a default of 0 to 250
+		return false, "invalid value provided for maximum number of cards to return. Must be between 0 - 250"
 	}
 
 	if r.Paramters.OrderBy != "" && r.Paramters.OrderBy != "name" && r.Paramters.OrderBy != "number" && r.Paramters.OrderBy != "set" {
