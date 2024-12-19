@@ -10,12 +10,14 @@ type CardHandler interface {
 	GetCards(req model.GetCardsRequest) ([]model.PokemonCard, error)
 }
 
-type TcgApiHandler struct{}
+type TcgApiHandler struct {
+	Apikey string
+}
 
 func (t TcgApiHandler) GetCardById(id string) (model.PokemonCard, error) {
 	return tcgapi.GetCardById(id)
 }
 
 func (t TcgApiHandler) GetCards(req model.GetCardsRequest) ([]model.PokemonCard, error) {
-	return tcgapi.GetCards(req)
+	return tcgapi.GetCards(req, t.Apikey)
 }
