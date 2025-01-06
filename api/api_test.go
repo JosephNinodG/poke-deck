@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/JosephNinodG/poke-deck/model"
+	"github.com/JosephNinodG/poke-deck/domain"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
@@ -108,7 +108,7 @@ func Test_GetCardById(t *testing.T) {
 			}
 
 			if test.expectedStatusCode == http.StatusOK {
-				var response model.PokemonCard
+				var response domain.PokemonCard
 
 				err := json.NewDecoder(res.Body).Decode(&response)
 				if err != nil {
@@ -221,7 +221,7 @@ func Test_GetCards(t *testing.T) {
 			}
 
 			if test.expectedStatusCode == http.StatusOK {
-				var response []model.PokemonCard
+				var response []domain.PokemonCard
 
 				err := json.NewDecoder(res.Body).Decode(&response)
 				if err != nil {

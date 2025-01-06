@@ -10,33 +10,33 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/JosephNinodG/poke-deck/model"
+	"github.com/JosephNinodG/poke-deck/domain"
 	"github.com/PokemonTCG/pokemon-tcg-sdk-go-v2/pkg/request"
 )
 
 //TODO: Add mapper from pokemon-tcg-sdk-go-v2 to model.PokemonCard to allow Legalities in struct
 
-func GetCardById(id string) (model.PokemonCard, error) {
+func GetCardById(id string) (domain.PokemonCard, error) {
 	card, err := client.GetCardByID(id)
 	if err != nil {
-		return model.PokemonCard{}, err
+		return domain.PokemonCard{}, err
 	}
 
 	if card == nil {
-		return model.PokemonCard{}, nil
+		return domain.PokemonCard{}, nil
 	}
 
-	pokemonCard := model.PokemonCard(*card)
+	pokemonCard := CardMapper(*card)
 
 	return pokemonCard, nil
 }
 
-func GetCards(req model.GetCardsRequest, apikey string) ([]model.PokemonCard, error) {
+func GetCards(req domain.GetCardsRequest, apikey string) ([]domain.PokemonCard, error) {
 	if req.Paramters.OrderBy != "" && req.Paramters.Desc {
 		req.Paramters.OrderBy = fmt.Sprintf("-%v", req.Paramters.OrderBy)
 	}
 
-	var pokemonCards []model.PokemonCard
+	var pokemonCards []domain.PokemonCard
 	var err error
 
 	if req.Card.Legalities.Standard != "" || req.Card.Legalities.Expanded != "" {
@@ -56,17 +56,16 @@ func GetCards(req model.GetCardsRequest, apikey string) ([]model.PokemonCard, er
 		}
 
 		for _, card := range cards {
-			pokemonCards = append(pokemonCards, model.PokemonCard(*card))
+			pokemonCards = append(pokemonCards, CardMapper(*card))
 		}
 	}
 
 	return pokemonCards, nil
 }
 
-func getCardsWithQueryParams(req model.GetCardsRequest, apikey string) ([]model.PokemonCard, error) {
+func getCardsWithQueryParams(req domain.GetCardsRequest, apikey string) ([]domain.PokemonCard, error) {
 	queryList := buildQuery(req.Card)
 	queryString := buildQueryString(queryList)
-	//queryParams := addQueryParameters(queryString, req.Paramters)
 
 	ctx := context.Background()
 	request, err := http.NewRequestWithContext(ctx, "GET", "https://api.pokemontcg.io/v2/cards", bytes.NewBuffer([]byte(``)))
@@ -83,9 +82,6 @@ func getCardsWithQueryParams(req model.GetCardsRequest, apikey string) ([]model.
 	request.URL.RawQuery = values.Encode()
 	client := &http.Client{}
 	res, err := client.Do(request)
-
-	// requestURL := fmt.Sprintf("https://api.pokemontcg.io/v2/cards%v", queryParams)
-	// res, err := http.Get(requestURL)
 	if err != nil {
 		return nil, err
 	}
@@ -102,24 +98,11 @@ func getCardsWithQueryParams(req model.GetCardsRequest, apikey string) ([]model.
 	}
 
 	cardList := struct {
-		Data []model.PokemonCard `json:"data"`
+		Data []domain.PokemonCard `json:"data"`
 	}{}
 	if err := json.NewDecoder(res.Body).Decode(&cardList); err != nil {
 		return nil, err
 	}
-
-	// resBody, _ := getResponseBodyAsString(res.Body)
-
-	// var data Data
-	// err = json.Unmarshal([]byte(resBody), &data)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// var pokemonCards []model.PokemonCard
-	// for _, card := range data.cards {
-	// 	pokemonCards = append(pokemonCards, model.PokemonCard(*card))
-	// }
 
 	return cardList.Data, nil
 }
@@ -134,7 +117,7 @@ func getResponseBodyAsString(responseBody io.ReadCloser) (string, error) {
 	return buf.String(), nil
 }
 
-func buildQuery(card model.Card) []string {
+func buildQuery(card domain.Card) []string {
 	var query []string
 
 	if card.Name != "" {
@@ -192,7 +175,7 @@ func buildQueryString(queryList []string) string {
 	return queryString
 }
 
-func addQueryParameters(queryString string, parameters model.Parameters) string {
+func addQueryParameters(queryString string, parameters domain.Parameters) string {
 	if parameters.OrderBy != "" {
 		queryString = fmt.Sprintf("%v&orderBy=%v", queryString, parameters.OrderBy)
 	}
