@@ -29,10 +29,10 @@ type PokemonCard struct {
 }
 
 type Traits struct {
-	Name  *string `json:"name"`
-	Text  *string `json:"text"`
-	Type  *string `json:"type"`
-	Value *string `json:"value"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	Type        *string `json:"type"`
+	Value       *string `json:"value"`
 }
 
 type Images struct {
@@ -53,7 +53,7 @@ type Attack struct {
 	Cost                []string `json:"cost"`
 	ConvertedEnergyCost int      `json:"convertedEnergyCost"`
 	Damage              string   `json:"damage"`
-	Text                string   `json:"text"`
+	Description         string   `json:"description"`
 }
 
 type Set struct {
@@ -82,11 +82,11 @@ type Set struct {
 // 	Rules        []string `json:"rules"`
 // 	AncientTrait *struct {
 // 		Name string `json:"name"`
-// 		Text string `json:"text"`
+// 		description string `json:"description"`
 // 	} `json:"ancientTrait"`
 // 	Abilities []struct {
 // 		Name string `json:"name"`
-// 		Text string `json:"text"`
+// 		description string `json:"description"`
 // 		Type string `json:"type"`
 // 	} `json:"abilities"`
 // 	Attacks []struct {
@@ -94,7 +94,7 @@ type Set struct {
 // 		Cost                []string `json:"cost"`
 // 		ConvertedEnergyCost int      `json:"convertedEnergyCost"`
 // 		Damage              string   `json:"damage"`
-// 		Text                string   `json:"text"`
+// 		description                string   `json:"description"`
 // 	} `json:"attacks"`
 // 	Weaknesses []struct {
 // 		Type  string `json:"type"`
@@ -126,7 +126,7 @@ type Set struct {
 // 	Number                 string `json:"number"`
 // 	Artist                 string `json:"artist"`
 // 	Rarity                 string `json:"rarity"`
-// 	FlavorText             string `json:"flavorText"`
+// 	Flavordescription             string `json:"flavordescription"`
 // 	NationalPokedexNumbers []int  `json:"nationalPokedexNumbers"`
 // 	Legalities             struct {
 // 		Unlimited string `json:"unlimited"`
