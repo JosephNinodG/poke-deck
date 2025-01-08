@@ -11,10 +11,10 @@ func CardMapper(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 		Name:                   apiCard.Name,
 		Supertype:              apiCard.Supertype,
 		Subtypes:               apiCard.Subtypes,
-		Level:                  apiCard.Level,
+		Level:                  &apiCard.Level,
 		Hp:                     apiCard.Hp,
 		Types:                  apiCard.Types,
-		EvolvesFrom:            apiCard.EvolvesFrom,
+		EvolvesFrom:            &apiCard.EvolvesFrom,
 		EvolvesTo:              apiCard.EvolvesTo,
 		Rules:                  apiCard.Rules,
 		RetreatCost:            apiCard.RetreatCost,
@@ -32,7 +32,7 @@ func CardMapper(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 			Description: &apiAbility.Text,
 			Type:        &apiAbility.Type,
 		}
-		pokemonCard.Abilities = append(pokemonCard.Abilities, traits)
+		pokemonCard.Abilities = append(pokemonCard.Abilities, &traits)
 	}
 
 	for _, apiAttack := range apiCard.Attacks {

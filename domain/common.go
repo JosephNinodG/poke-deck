@@ -5,14 +5,14 @@ type PokemonCard struct {
 	Name                   string     `json:"name"`
 	Supertype              string     `json:"supertype"`
 	Subtypes               []string   `json:"subtypes"`
-	Level                  string     `json:"level"`
+	Level                  *string    `json:"level"`
 	Hp                     string     `json:"hp"`
 	Types                  []string   `json:"types"`
-	EvolvesFrom            string     `json:"evolvesFrom"`
+	EvolvesFrom            *string    `json:"evolvesFrom"`
 	EvolvesTo              []string   `json:"evolvesTo"`
 	Rules                  []string   `json:"rules"`
 	AncientTrait           *Traits    `json:"ancientTrait"`
-	Abilities              []Traits   `json:"abilities"`
+	Abilities              []*Traits  `json:"abilities"`
 	Attacks                []Attack   `json:"attacks"`
 	Weaknesses             []Traits   `json:"weaknesses"`
 	Resistances            []Traits   `json:"resistances"`

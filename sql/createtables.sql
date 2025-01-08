@@ -54,10 +54,10 @@ create table "card"(
  "name"	varchar(200) NOT NULL,
  	supertype varchar(50) NOT NULL,
   subtypes varchar(100) ARRAY NOT NULL,
-  "level" varchar(50) NOT NULL,
+  "level" varchar(50),
   "hp" varchar(50) NOT NULL,
   "types" varchar(100) ARRAY NOT NULL,
-  evolvesFrom varchar(100) NOT NULL,
+  evolvesFrom varchar(100),
   evolvesTo varchar(100) ARRAY NOT NULL,
   rules varchar(200) ARRAY NOT NULL,
   retreatCost varchar(50) ARRAY NOT NULL,
@@ -116,13 +116,58 @@ insert into "attack" ("name", "cost", "convertedenergycost", "damage", "descript
 values ('attack1', '{"colorless","colorless"}', 2, '40', 'Placeholder description.')
 
 insert into "attack" ("name", "cost", "convertedenergycost", "damage", "description")
-values ('attack2', '{"Grass","colorless","colorless"}', 3, '60', 'Placeholder description.')
+values ('attack2', '{"Lightning","colorless","colorless"}', 3, '100', 'Placeholder description.')
 
 insert into "images" ("small", "large", "symbol", "logo")
-values ('smallimage1.png', 'largeimage1.png', 'symbol1.png', 'logo1.png')
+values ('card-smallimage1.png', 'card-largeimage1.png', null, null)
 
 insert into "images" ("small", "large", "symbol", "logo")
-values ('smallimage2.png', 'largeimage2.png', 'symbol2.png', 'logo2.png')
+values (null, null, 'set-symbol1.png', 'set-logo1.png')
+
+insert into "images" ("small", "large", "symbol", "logo")
+values ('card-smallimage2.png', 'card-largeimage2.png', null, null)
+
+insert into "images" ("small", "large", "symbol", "logo")
+values (null, null, 'set-symbol2.png', 'set-logo2.png')
 
 insert into "legalities" ("standard", "expanded", "unlimited")
 values ('legal', 'legal', 'legal')
+
+insert into "traits" ("name", "description", "type", "value")
+values ('ancienttrait1', 'Placeholder description.', null, null),
+('ancienttrait2', 'Placeholder description.', null, null),
+('ability1', 'Placeholder description.', 'Poke-Power', null),
+('ability2', 'Placeholder description.', 'Ability', null),
+('ability3', 'Placeholder description.', 'Poké-Body', null),
+(null, 'weakness', 'Fighting', '+20'),
+(null, 'weakness', 'Water', 'x2'),
+(null, 'resistance', 'Metal', '-20')
+
+insert into "sets" ("name", "series", "printedtotal", "total", "ptcgocode", "releasedate", "updateddate", "legalities_id", "images_id")
+values ('set1','series1',100,150,'s1','2025/01/01','2025/01/01',1,2),
+('set2','series2',100,150,'s2','2024/01/01','2024/01/01',1,4)
+
+insert into "card" ("name","supertype","subtypes","level","hp","types","evolvesfrom","evolvesto","rules","retreatcost","convertedretreatcost","number","artist","rarity","flavorText","nationalPokedexNumbers","ancienttrait_id","set_id","legalities_id","images_id")
+values ('card1','Pokemon','{"Basic"}',null,'50','{"Lightning"}',null,'{"card2"}','{"Placeholder rules."}','{"Colorless","Colorless"}',2,1,'artist','Uncommon','Placeholder text.','{1}',null,1,1,1),
+('card2','Pokemon','{"Stage 1"}',null,'100','{"Lightning"}','card1','{}','{"Placeholder rules."}','{"Lightning","Colorless","Colorless"}',3,2,'artist','Rare','Placeholder text.','{2}',null,1,1,2)
+
+insert into "card_ability" ("card_id", "ability_id")
+values (2, 4)
+
+insert into "card_attack" ("card_id", "attack_id")
+values (1, 1), (2, 2) 
+
+insert into "card_resistance" ("card_id", "resistance_id")
+values (1, 8), (2, 8)
+
+insert into "card_weakness" ("card_id", "weakness_id")
+values (1, 6), (2, 6)
+
+insert into "collection" ("name", "user_id")
+values ("testcollection1", 1)
+
+insert into "collection_card" ("card_id", "collection_id")
+values (1, 1), (2, 1)
+
+-- example JOIN:
+SELECT c as card, a as attack from card c join card_attack ca on ca.card_id = c.id join attack a on a.id = ca.attack_id
