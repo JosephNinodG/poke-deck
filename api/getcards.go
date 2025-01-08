@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/JosephNinodG/poke-deck/model"
+	"github.com/JosephNinodG/poke-deck/domain"
 )
 
 func GetCards(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	endpointName := "GetCard"
 
-	var req model.GetCardsRequest
+	var req domain.GetCardsRequest
 
 	if strings.ToUpper(r.Method) != http.MethodGet {
 		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodGet, "actual", r.Method)

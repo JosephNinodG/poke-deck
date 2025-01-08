@@ -30,7 +30,7 @@ func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
-	api.Configure(handler.TcgApiHandler{})
+	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
 	go startHTTPServer(ctx, cancelFunc, appname)
