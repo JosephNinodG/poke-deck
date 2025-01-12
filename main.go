@@ -12,6 +12,7 @@ import (
 	"syscall"
 
 	"github.com/JosephNinodG/poke-deck/api"
+	"github.com/JosephNinodG/poke-deck/db"
 	"github.com/JosephNinodG/poke-deck/handler"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
@@ -19,19 +20,34 @@ import (
 var (
 	httpPort  int
 	tcgapikey string
+	localDev  bool
 )
 
 func main() {
 	flag.StringVar(&tcgapikey, "tcg_api_key", "", "Pokemon TCG API key")
 	flag.IntVar(&httpPort, "http_port", 8080, "Http Port")
+	flag.BoolVar(&localDev, "local_dev", true, "Local Dev")
 	flag.Parse()
+
+	var dbconnection db.Connection
+	if localDev {
+		dbconnection.Host = "localhost"
+		dbconnection.Port = 5432
+		dbconnection.DbUser = "postgres"
+		dbconnection.DbPassword = "postgres"
+		dbconnection.DbName = "pokedeck"
+	}
 
 	appname := "poke-deck"
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
+	dbconnection.NewClient(ctx)
 	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey})
 	tcgapi.SetUpClient(ctx, tcgapikey)
+
+	db.SelectUserCollection(ctx, 1, 1)
+	//slog.InfoContext(ctx, "Collection", "collection", collection)
 
 	go startHTTPServer(ctx, cancelFunc, appname)
 
@@ -41,6 +57,7 @@ func main() {
 	//Wait until a termination signal or a context cancellation
 	select {
 	case <-termChan:
+		db.CloseClient(ctx)
 		cancelFunc()
 	case <-ctx.Done():
 	}

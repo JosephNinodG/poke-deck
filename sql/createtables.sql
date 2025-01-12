@@ -79,6 +79,7 @@ create table "set"(
 
 create table "card"(
  id serial primary key,
+ "cardID" varchar(50) NOT NULL,
  "name"	varchar(200) NOT NULL,
  	"supertype" varchar(50) NOT NULL,
   "subtypes" varchar(100) ARRAY NOT NULL,
@@ -177,9 +178,9 @@ insert into "set" ("name", "series", "printedTotal", "total", "ptcgoCode", "rele
 values ('set1','series1',100,150,'s1','2025/01/01','2025/01/01',1,1),
 ('set2','series2',100,150,'s2','2024/01/01','2024/01/01',1,2);
 
-insert into "card" ("name","supertype","subtypes","level","hp","types","evolvesFrom","evolvesTo","rules","retreatCost","convertedRetreatCost","number","artist","rarity","flavorText","nationalPokedexNumbers","ancient_trait_id","set_id","card_legalities_id","card_images_id")
-values ('card1','Pokemon','{"Basic"}',null,'50','{"Lightning"}',null,'{"card2"}','{"Placeholder rules."}','{"Colorless","Colorless"}',2,1,'artist','Uncommon','Placeholder text.','{1}',null,1,1,1),
-('card2','Pokemon','{"Stage 1"}',null,'100','{"Lightning"}','card1','{}','{"Placeholder rules."}','{"Lightning","Colorless","Colorless"}',3,2,'artist','Rare','Placeholder text.','{2}',null,1,1,2);
+insert into "card" ("cardID", "name","supertype","subtypes","level","hp","types","evolvesFrom","evolvesTo","rules","retreatCost","convertedRetreatCost","number","artist","rarity","flavorText","nationalPokedexNumbers","ancient_trait_id","set_id","card_legalities_id","card_images_id")
+values ('test-card-1','card1','Pokemon','{"Basic"}',null,'50','{"Lightning"}',null,'{"card2"}','{"Placeholder rules."}','{"Colorless","Colorless"}',2,1,'artist','Uncommon','Placeholder text.','{1}',null,1,1,1),
+('test-card-2','card2','Pokemon','{"Stage 1"}',null,'100','{"Lightning"}','card1','{}','{"Placeholder rules."}','{"Lightning","Colorless","Colorless"}',3,2,'artist','Rare','Placeholder text.','{2}',null,1,1,2);
 
 insert into "card_ability" ("card_id", "ability_id")
 values (2, 2);
