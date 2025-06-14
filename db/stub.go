@@ -12,7 +12,12 @@ var stubRepo stubRepository
 
 type userCollection struct {
 	userID     int
-	collection map[int][]domain.PokemonCard
+	collection map[int]collection
+}
+
+type collection struct {
+	collectionName  string
+	collectionCards []domain.PokemonCard
 }
 
 type stubRepository struct {
@@ -26,7 +31,7 @@ func SetUpStubRepository(ctx context.Context, apikey string) {
 	slog.InfoContext(ctx, "New stub data repository created")
 }
 
-func (d StubDatabaseHandler) GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]domain.PokemonCard, error) {
+func (d StubDatabaseHandler) GetUserCollection(ctx context.Context, req domain.GetUserCollectionRequest) ([]domain.PokemonCard, error) {
 	for _, collection := range stubRepo.collections {
 		if collection.userID == req.UserID {
 			userCollection, ok := collection.collection[req.CollectionID]
@@ -34,96 +39,68 @@ func (d StubDatabaseHandler) GetUserCollection(ctx context.Context, req domain.G
 				return nil, fmt.Errorf("no collections for userID %v", req.UserID)
 			}
 
-			return userCollection, nil
+			return userCollection.collectionCards, nil
 		}
 	}
 
 	return nil, nil
 }
 
+func (d StubDatabaseHandler) CreateUserCollection(ctx context.Context, req domain.CreateUserCollectionRequest) error {
+	var currentHighestKey int
+
+	for k, _ := range stubRepo.collections {
+		if k > currentHighestKey {
+			currentHighestKey = k
+		}
+	}
+
+	currentHighestKey++
+
+	newCollection := userCollection{userID: req.UserID, collection: map[int]collection{currentHighestKey: {collectionName: req.CollectionName, collectionCards: []domain.PokemonCard{}}}}
+
+	stubRepo.collections = append(stubRepo.collections, newCollection)
+
+	return nil
+}
+
 var stubCollections = []userCollection{
 	{
 		userID: 1,
-		collection: map[int][]domain.PokemonCard{
+		collection: map[int]collection{
 			1: {
-				{
-					ID:        "test-ID-1",
-					Name:      "test-name-1",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
-					Types:     []string{"test-type-1", "test-type-2"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "100",
-				},
-				{
-					ID:        "test-ID-2",
-					Name:      "test-name-2",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
-					Types:     []string{"test-type-1", "test-type-2"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "50",
-				},
-				{
-					ID:        "test-ID-3",
-					Name:      "test-name-3",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-2", "test-subtype-3"},
-					Types:     []string{"test-type-3", "test-type-4"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "0",
-				},
-			},
-		},
-	},
-	{
-		userID: 2,
-		collection: map[int][]domain.PokemonCard{
-			1: {
-				{
-					ID:        "test-ID-1",
-					Name:      "test-name-1",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
-					Types:     []string{"test-type-1", "test-type-2"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "100",
-				},
-			},
-			2: {
-				{
-					ID:        "test-ID-1",
-					Name:      "test-name-1",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
-					Types:     []string{"test-type-1", "test-type-2"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "100",
-				},
-				{
-					ID:        "test-ID-2",
-					Name:      "test-name-2",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
-					Types:     []string{"test-type-1", "test-type-2"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "50",
-				},
-				{
-					ID:        "test-ID-3",
-					Name:      "test-name-3",
-					Supertype: "test-supertype",
-					Subtypes:  []string{"test-subtype-2", "test-subtype-3"},
-					Types:     []string{"test-type-3", "test-type-4"},
-					Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
-					Set:       domain.Set{Name: "test-set"},
-					Number:    "0",
+				collectionName: "test-user1-collection1",
+				collectionCards: []domain.PokemonCard{
+					{
+						ID:        "test-ID-1",
+						Name:      "test-name-1",
+						Supertype: "test-supertype",
+						Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
+						Types:     []string{"test-type-1", "test-type-2"},
+						Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
+						Set:       domain.Set{Name: "test-set"},
+						Number:    "100",
+					},
+					{
+						ID:        "test-ID-2",
+						Name:      "test-name-2",
+						Supertype: "test-supertype",
+						Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
+						Types:     []string{"test-type-1", "test-type-2"},
+						Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
+						Set:       domain.Set{Name: "test-set"},
+						Number:    "50",
+					},
+					{
+						ID:        "test-ID-3",
+						Name:      "test-name-3",
+						Supertype: "test-supertype",
+						Subtypes:  []string{"test-subtype-2", "test-subtype-3"},
+						Types:     []string{"test-type-3", "test-type-4"},
+						Attacks:   []domain.Attack{{Name: "test-attack-1"}, {Name: "test-attack-2"}},
+						Set:       domain.Set{Name: "test-set"},
+						Number:    "0",
+					},
 				},
 			},
 		},

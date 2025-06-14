@@ -10,16 +10,16 @@ import (
 	"github.com/JosephNinodG/poke-deck/domain"
 )
 
-func GetUserCollection(w http.ResponseWriter, r *http.Request) {
+func CreateUserCollection(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	endpointName := "GetUserCollection"
+	endpointName := "CreateUserCollection"
 
-	var req GetUserCollectionRequest
+	var req CreateUserCollectionRequest
 
-	if strings.ToUpper(r.Method) != http.MethodGet {
-		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodGet, "actual", r.Method)
+	if strings.ToUpper(r.Method) != http.MethodPost {
+		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodPost, "actual", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, err := w.Write([]byte(fmt.Sprintf("HTTP method not allowed on route. Expected %v", http.MethodGet)))
+		_, err := w.Write([]byte(fmt.Sprintf("HTTP method not allowed on route. Expected %v", http.MethodPost)))
 		if err != nil {
 			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
 		}
@@ -49,23 +49,15 @@ func GetUserCollection(w http.ResponseWriter, r *http.Request) {
 
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "request", req)
 
-	getUserCollectionRequest := domain.GetUserCollectionRequest{
-		UserID:       req.UserID,
-		CollectionID: req.CollectionID,
+	createUserCollectionRequest := domain.CreateUserCollectionRequest{
+		UserID:         req.UserID,
+		CollectionName: req.CollectionName,
 	}
 
-	response, err := databaseHandler.GetUserCollection(ctx, getUserCollectionRequest)
+	err = databaseHandler.CreateUserCollection(ctx, createUserCollectionRequest)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "request", req, "error", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "error encoding response body", "endpoint", endpointName, "error", err)
 		return
 	}
 
