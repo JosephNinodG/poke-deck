@@ -4,54 +4,37 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/JosephNinodG/poke-deck/domain"
 )
 
-func SelectUserCollection(ctx context.Context, userID, collectionID int) {
-	dsn := "postgres://postgres:postgres@localhost:5432/pokedeck"
-
-	pool, err := pgxpool.New(context.Background(), dsn)
+func SelectUserCollection(ctx context.Context, collectionID, userID int) ([]domain.PokemonCard, error) {
+	rows, err := client.QueryContext(ctx, selectUserCollectionQuery, collectionID, userID)
 	if err != nil {
-		slog.ErrorContext(ctx, "Unable to connect to database: %v", err)
-	}
-	defer pool.Close()
-
-	rows, err := pool.Query(context.Background(), selectUserCollectionQuery, collectionID, userID)
-	if err != nil {
-		slog.ErrorContext(ctx, "Query execution failed: %v", err)
+		return nil, fmt.Errorf("unable to connect to execute SelectUserCollection query. %v", err.Error())
 	}
 	defer rows.Close()
 
-	var cards []domain.PokemonCard
+	var collection []domain.PokemonCard
 	for rows.Next() {
-		var cardJSON []byte
-		if err := rows.Scan(&cardJSON); err != nil {
-			slog.ErrorContext(ctx, "Row scan failed: %v", err)
+		var cardByte []byte
+		if err := rows.Scan(&cardByte); err != nil {
+			return nil, fmt.Errorf("unable to connect to read rows. %v", err.Error())
 		}
 
 		var card domain.PokemonCard
-		if err := json.Unmarshal(cardJSON, &card); err != nil {
-			slog.ErrorContext(ctx, "Failed to unmarshal JSON: %v", err)
+		if err := json.Unmarshal(cardByte, &card); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal JSON. %v", err.Error())
 		}
 
-		cards = append(cards, card)
+		collection = append(collection, card)
 	}
 
-	// Check for any row errors.
 	if err := rows.Err(); err != nil {
-		slog.ErrorContext(ctx, "Row iteration error: %v", err)
+		return nil, fmt.Errorf("row iteration error. %v", err.Error())
 	}
 
-	// Output the result.
-	output, err := json.MarshalIndent(cards, "", "  ")
-	if err != nil {
-		slog.ErrorContext(ctx, "Failed to marshal result to JSON: %v", err)
-	}
-	fmt.Println(string(output))
+	return collection, nil
 }
 
 var selectUserCollectionQuery = `SELECT
@@ -172,21 +155,21 @@ LEFT JOIN
 LEFT JOIN
 		card_attack ON card.id = card_attack.card_id
 LEFT JOIN
-		attack ON card_attack.attack_id = attack.id 
+		attack ON card_attack.attack_id = attack.id
 LEFT JOIN
 		card_weakness ON card.id = card_weakness.card_id
 LEFT JOIN
-		weakness ON card_weakness.weakness_id = weakness.id  
+		weakness ON card_weakness.weakness_id = weakness.id
 LEFT JOIN
 		card_resistance ON card.id = card_resistance.card_id
 LEFT JOIN
 		resistance ON card_resistance.resistance_id = resistance.id
 WHERE
-		collection.id = $1 AND "user".id = $2 
+		collection.id = $1 AND "user".id = $2
 GROUP BY
-		card.id, card.name, 
-    card_legalities.standard, card_legalities.expanded, card_legalities.unlimited, 
-    card_images.small, card_images.large, 
+		card.id, card.name,
+    card_legalities.standard, card_legalities.expanded, card_legalities.unlimited,
+    card_images.small, card_images.large,
     ancient_trait.name, ancient_trait.description,
     "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
     set_legalities.standard, set_legalities.expanded, set_legalities.unlimited,
