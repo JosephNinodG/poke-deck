@@ -23,12 +23,12 @@ func GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]dom
 			return nil, fmt.Errorf("unable to connect to read rows. %v", err.Error())
 		}
 
-		var card domain.PokemonCard
-		if err := json.Unmarshal(cardByte, &card); err != nil {
+		var pokemonCard PokemonCard
+		if err := json.Unmarshal(cardByte, &pokemonCard); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal JSON. %v", err.Error())
 		}
 
-		collection = append(collection, card)
+		collection = append(collection, pokemonCard.MapToDomain())
 	}
 
 	if err := rows.Err(); err != nil {

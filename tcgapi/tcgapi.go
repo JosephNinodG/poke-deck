@@ -26,7 +26,7 @@ func GetCardById(id string) (domain.PokemonCard, error) {
 		return domain.PokemonCard{}, nil
 	}
 
-	pokemonCard := CardMapper(*card)
+	pokemonCard := MapToDomain(*card)
 
 	return pokemonCard, nil
 }
@@ -56,7 +56,7 @@ func GetCards(req domain.GetCardsRequest, apikey string) ([]domain.PokemonCard, 
 		}
 
 		for _, card := range cards {
-			pokemonCards = append(pokemonCards, CardMapper(*card))
+			pokemonCards = append(pokemonCards, MapToDomain(*card))
 		}
 	}
 

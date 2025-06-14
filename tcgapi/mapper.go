@@ -5,7 +5,7 @@ import (
 	pokemontcgv2 "github.com/PokemonTCG/pokemon-tcg-sdk-go-v2/pkg"
 )
 
-func CardMapper(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
+func MapToDomain(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 	var pokemonCard = domain.PokemonCard{
 		ID:                     apiCard.ID,
 		Name:                   apiCard.Name,
