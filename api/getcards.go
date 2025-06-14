@@ -14,7 +14,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	endpointName := "GetCard"
 
-	var req domain.GetCardsRequest
+	var req GetCardsRequest
 
 	if strings.ToUpper(r.Method) != http.MethodGet {
 		slog.ErrorContext(ctx, "HTTP method not allowed on route", "path", r.URL.Path, "expected", http.MethodGet, "actual", r.Method)
@@ -37,7 +37,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	valid, message := req.Validate()
+	valid, message := req.IsValid()
 	if !valid {
 		slog.ErrorContext(ctx, "request is invalid", "endpoint", endpointName, "request", req)
 		w.WriteHeader(http.StatusBadRequest) //TODO: Change to 204
@@ -50,7 +50,20 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "request", req)
 
-	response, err := cardHandler.GetCards(req)
+	getCardRequest := domain.GetCardsRequest{
+		Card: domain.CardDetails{
+			Name:       req.Card.Name,
+			Type:       req.Card.Type,
+			Supertype:  req.Card.Supertype,
+			Subtype:    req.Card.Subtype,
+			Set:        req.Card.Set,
+			Attack:     req.Card.Attack,
+			Legalities: domain.Legalities(req.Card.Legalities),
+		},
+		Paramters: domain.Parameters(req.Paramters),
+	}
+
+	response, err := cardHandler.GetCards(getCardRequest)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "request", req, "error", err)

@@ -117,7 +117,7 @@ func getResponseBodyAsString(responseBody io.ReadCloser) (string, error) {
 	return buf.String(), nil
 }
 
-func buildQuery(card domain.Card) []string {
+func buildQuery(card domain.CardDetails) []string {
 	var query []string
 
 	if card.Name != "" {

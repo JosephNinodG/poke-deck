@@ -1,13 +1,22 @@
-package domain
+package api
 
 import "reflect"
 
-type GetCardsRequest struct {
-	Card      Card       `json:"card"`
-	Paramters Parameters `json:"parameters"`
+type GetUserCollectionRequest struct {
+	UserID       int
+	CollectionID int
 }
 
-type Card struct {
+func (r *GetUserCollectionRequest) IsValid() bool {
+	return r.UserID > 0 && r.CollectionID > 0
+}
+
+type GetCardsRequest struct {
+	Card      CardDetails `json:"card"`
+	Paramters Parameters  `json:"parameters"`
+}
+
+type CardDetails struct {
 	Name       string     `json:"name"`
 	Type       string     `json:"type"`
 	Supertype  string     `json:"supertype"`
@@ -17,13 +26,19 @@ type Card struct {
 	Legalities Legalities `json:"legalities"`
 }
 
+type Legalities struct {
+	Standard  string `db:"standard" json:"standard"`
+	Expanded  string `db:"expanded" json:"expanded"`
+	Unlimited string `db:"unlimited" json:"unlimited"`
+}
+
 type Parameters struct {
 	MaxCards int    `json:"maxCards"`
 	OrderBy  string `json:"orderBy"`
 	Desc     bool   `json:"desc"`
 }
 
-func (r GetCardsRequest) Validate() (bool, string) {
+func (r GetCardsRequest) IsValid() (bool, string) {
 	if reflect.ValueOf(r.Card).IsZero() {
 		return false, "invalid request. At least one value in the card object must be provided"
 	}
