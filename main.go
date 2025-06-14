@@ -21,21 +21,31 @@ var (
 	httpPort  int
 	tcgapikey string
 	localDev  bool
+
+	dbhost     string
+	dbport     int
+	dbuser     string
+	dbpassword string
+	dbname     string
 )
 
 func main() {
 	flag.StringVar(&tcgapikey, "tcg_api_key", "", "Pokemon TCG API key")
 	flag.IntVar(&httpPort, "http_port", 8080, "Http Port")
 	flag.BoolVar(&localDev, "local_dev", true, "Local Dev")
+	flag.StringVar(&dbhost, "db_host", "localhost", "Database Connection Host")
+	flag.IntVar(&dbport, "db_port", 5432, "Database Connection Port")
+	flag.StringVar(&dbuser, "db_user", "postgres", "Database Connection User")
+	flag.StringVar(&dbpassword, "db_password", "postgres", "Database Connection Password")
+	flag.StringVar(&dbname, "db_name", "pokedeck", "Database Name")
 	flag.Parse()
 
-	var dbconnection db.Connection
-	if localDev {
-		dbconnection.Host = "localhost"
-		dbconnection.Port = 5432
-		dbconnection.DbUser = "postgres"
-		dbconnection.DbPassword = "postgres"
-		dbconnection.DbName = "pokedeck"
+	var dbconnection = db.Connection{
+		Host:       dbhost,
+		Port:       dbport,
+		DbUser:     dbuser,
+		DbPassword: dbpassword,
+		DbName:     dbname,
 	}
 
 	appname := "poke-deck"
@@ -45,9 +55,6 @@ func main() {
 	dbconnection.NewClient(ctx)
 	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey})
 	tcgapi.SetUpClient(ctx, tcgapikey)
-
-	db.SelectUserCollection(ctx, 1, 1)
-	//slog.InfoContext(ctx, "Collection", "collection", collection)
 
 	go startHTTPServer(ctx, cancelFunc, appname)
 
