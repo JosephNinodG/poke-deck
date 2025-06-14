@@ -8,8 +8,8 @@ import (
 	"github.com/JosephNinodG/poke-deck/domain"
 )
 
-func SelectUserCollection(ctx context.Context, collectionID, userID int) ([]domain.PokemonCard, error) {
-	rows, err := client.QueryContext(ctx, selectUserCollectionQuery, collectionID, userID)
+func GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]domain.PokemonCard, error) {
+	rows, err := client.QueryContext(ctx, selectUserCollectionQuery, req.CollectionID, req.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to execute SelectUserCollection query. %v", err.Error())
 	}

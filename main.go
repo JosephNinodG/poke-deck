@@ -53,7 +53,7 @@ func main() {
 	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
 	dbconnection.NewClient(ctx)
-	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey})
+	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey}, handler.DatabaseHandler{})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
 	go startHTTPServer(ctx, cancelFunc, appname)
@@ -85,6 +85,7 @@ func startHTTPServer(ctx context.Context, cancelFunc context.CancelFunc, appname
 
 	http.HandleFunc("/"+appname+"/getcards", api.GetCards)
 	http.HandleFunc("/"+appname+"/getcardbyid", api.GetCardById)
+	http.HandleFunc("/"+appname+"/getUserCollection", api.GetUserCollection)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), nil); err != nil {
 		if !errors.Is(err, http.ErrServerClosed) {

@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/JosephNinodG/poke-deck/db"
 	"github.com/JosephNinodG/poke-deck/domain"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
@@ -19,7 +20,7 @@ var tcgapikey string
 
 func TestMain(m *testing.M) {
 	ctx := context.Background()
-	Configure(tcgapi.StubTcgApiHandler{})
+	Configure(tcgapi.StubTcgApiHandler{}, db.StubDatabaseHandler{})
 
 	tcgapi.SetUpStubRepository(ctx, tcgapikey)
 
