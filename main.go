@@ -12,6 +12,7 @@ import (
 	"syscall"
 
 	"github.com/JosephNinodG/poke-deck/api"
+	"github.com/JosephNinodG/poke-deck/db"
 	"github.com/JosephNinodG/poke-deck/handler"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
@@ -19,18 +20,40 @@ import (
 var (
 	httpPort  int
 	tcgapikey string
+	localDev  bool
+
+	dbhost     string
+	dbport     int
+	dbuser     string
+	dbpassword string
+	dbname     string
 )
 
 func main() {
 	flag.StringVar(&tcgapikey, "tcg_api_key", "", "Pokemon TCG API key")
 	flag.IntVar(&httpPort, "http_port", 8080, "Http Port")
+	flag.BoolVar(&localDev, "local_dev", true, "Local Dev")
+	flag.StringVar(&dbhost, "db_host", "localhost", "Database Connection Host")
+	flag.IntVar(&dbport, "db_port", 5432, "Database Connection Port")
+	flag.StringVar(&dbuser, "db_user", "postgres", "Database Connection User")
+	flag.StringVar(&dbpassword, "db_password", "postgres", "Database Connection Password")
+	flag.StringVar(&dbname, "db_name", "pokedeck", "Database Name")
 	flag.Parse()
+
+	var dbconnection = db.Connection{
+		Host:       dbhost,
+		Port:       dbport,
+		DbUser:     dbuser,
+		DbPassword: dbpassword,
+		DbName:     dbname,
+	}
 
 	appname := "poke-deck"
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
-	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey})
+	dbconnection.NewClient(ctx)
+	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey}, handler.DatabaseHandler{})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
 	go startHTTPServer(ctx, cancelFunc, appname)
@@ -41,6 +64,7 @@ func main() {
 	//Wait until a termination signal or a context cancellation
 	select {
 	case <-termChan:
+		db.CloseClient(ctx)
 		cancelFunc()
 	case <-ctx.Done():
 	}
@@ -61,6 +85,7 @@ func startHTTPServer(ctx context.Context, cancelFunc context.CancelFunc, appname
 
 	http.HandleFunc("/"+appname+"/getcards", api.GetCards)
 	http.HandleFunc("/"+appname+"/getcardbyid", api.GetCardById)
+	http.HandleFunc("/"+appname+"/getusercollection", api.GetUserCollection)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), nil); err != nil {
 		if !errors.Is(err, http.ErrServerClosed) {

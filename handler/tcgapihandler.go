@@ -5,7 +5,7 @@ import (
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
-type CardHandler interface {
+type Card interface {
 	GetCardById(id string) (domain.PokemonCard, error)
 	GetCards(req domain.GetCardsRequest) ([]domain.PokemonCard, error)
 }

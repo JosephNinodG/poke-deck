@@ -5,16 +5,16 @@ import (
 	pokemontcgv2 "github.com/PokemonTCG/pokemon-tcg-sdk-go-v2/pkg"
 )
 
-func CardMapper(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
+func MapToDomain(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 	var pokemonCard = domain.PokemonCard{
 		ID:                     apiCard.ID,
 		Name:                   apiCard.Name,
 		Supertype:              apiCard.Supertype,
 		Subtypes:               apiCard.Subtypes,
-		Level:                  apiCard.Level,
+		Level:                  &apiCard.Level,
 		Hp:                     apiCard.Hp,
 		Types:                  apiCard.Types,
-		EvolvesFrom:            apiCard.EvolvesFrom,
+		EvolvesFrom:            &apiCard.EvolvesFrom,
 		EvolvesTo:              apiCard.EvolvesTo,
 		Rules:                  apiCard.Rules,
 		RetreatCost:            apiCard.RetreatCost,
@@ -28,17 +28,17 @@ func CardMapper(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 
 	for _, apiAbility := range apiCard.Abilities {
 		var traits = domain.Traits{
-			Name: &apiAbility.Name,
-			Text: &apiAbility.Text,
-			Type: &apiAbility.Type,
+			Name:        &apiAbility.Name,
+			Description: &apiAbility.Text,
+			Type:        &apiAbility.Type,
 		}
-		pokemonCard.Abilities = append(pokemonCard.Abilities, traits)
+		pokemonCard.Abilities = append(pokemonCard.Abilities, &traits)
 	}
 
 	for _, apiAttack := range apiCard.Attacks {
 		var attack = domain.Attack{
 			Name:                apiAttack.Name,
-			Text:                apiAttack.Text,
+			Description:         apiAttack.Text,
 			Cost:                apiAttack.Cost,
 			ConvertedEnergyCost: apiAttack.ConvertedEnergyCost,
 			Damage:              apiAttack.Damage,
@@ -64,8 +64,8 @@ func CardMapper(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 
 	if apiCard.AncientTrait != nil {
 		pokemonCard.AncientTrait = &domain.Traits{
-			Name: &apiCard.AncientTrait.Name,
-			Text: &apiCard.AncientTrait.Text,
+			Name:        &apiCard.AncientTrait.Name,
+			Description: &apiCard.AncientTrait.Text,
 		}
 	}
 
