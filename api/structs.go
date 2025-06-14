@@ -3,8 +3,8 @@ package api
 import "reflect"
 
 type GetUserCollectionRequest struct {
-	UserID       int
-	CollectionID int
+	UserID       int `json:"userId"`
+	CollectionID int `json:"collectionId"`
 }
 
 func (r *GetUserCollectionRequest) IsValid() bool {

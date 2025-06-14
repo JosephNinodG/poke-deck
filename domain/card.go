@@ -1,24 +1,24 @@
 package domain
 
 type GetCardsRequest struct {
-	Card      CardDetails `json:"card"`
-	Paramters Parameters  `json:"parameters"`
+	Card      CardDetails
+	Paramters Parameters
 }
 
 type CardDetails struct {
-	Name       string     `json:"name"`
-	Type       string     `json:"type"`
-	Supertype  string     `json:"supertype"`
-	Subtype    string     `json:"subtype"`
-	Set        string     `json:"set"`
-	Attack     string     `json:"attack"`
-	Legalities Legalities `json:"legalities"`
+	Name       string
+	Type       string
+	Supertype  string
+	Subtype    string
+	Set        string
+	Attack     string
+	Legalities Legalities
 }
 
 type Parameters struct {
-	MaxCards int    `json:"maxCards"`
-	OrderBy  string `json:"orderBy"`
-	Desc     bool   `json:"desc"`
+	MaxCards int
+	OrderBy  string
+	Desc     bool
 }
 
 type PokemonCard struct {
