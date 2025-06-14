@@ -69,5 +69,5 @@ func GetUserCollection(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "request", req)
+	slog.DebugContext(ctx, "response returned successfully", "endpoint", endpointName, "request", req)
 }

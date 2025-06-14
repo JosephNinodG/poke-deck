@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/JosephNinodG/poke-deck/domain"
 )
@@ -33,6 +34,8 @@ func GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]dom
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("row iteration error. %v", err.Error())
 	}
+
+	slog.DebugContext(ctx, "request to database successful", "UserID", req.UserID, "CollectionID", req.CollectionID)
 
 	return collection, nil
 }
