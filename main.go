@@ -52,7 +52,7 @@ func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	slog.InfoContext(ctx, fmt.Sprintf("App starting: %v", appname))
 
-	dbconnection.NewClient(ctx)
+	dbconnection.NewConnection(ctx)
 	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey}, handler.DatabaseHandler{})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
@@ -64,7 +64,7 @@ func main() {
 	//Wait until a termination signal or a context cancellation
 	select {
 	case <-termChan:
-		db.CloseClient(ctx)
+		db.CloseConnection(ctx)
 		cancelFunc()
 	case <-ctx.Done():
 	}

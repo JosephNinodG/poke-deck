@@ -10,7 +10,7 @@ import (
 )
 
 func GetUserCollection(ctx context.Context, req domain.GetUserCollectionRequest) ([]domain.PokemonCard, error) {
-	rows, err := client.QueryContext(ctx, selectUserCollectionQuery, req.CollectionID, req.UserID)
+	rows, err := conn.Query(ctx, selectUserCollectionQuery, req.CollectionID, req.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to execute GetUserCollection query %v", err.Error())
 	}
