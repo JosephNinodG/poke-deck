@@ -264,8 +264,7 @@ GROUP BY
     set_legalities.standard, set_legalities.expanded, set_legalities.unlimited,
     set_images.logo, set_images.logo
 
-------
-
+-- Get all the cards in collection x for user y as a JSON object
 SELECT
 	jsonb_build_object(
   	'id', card."cardID",
