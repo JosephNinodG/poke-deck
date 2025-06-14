@@ -9,10 +9,10 @@ import (
 	"github.com/JosephNinodG/poke-deck/domain"
 )
 
-func GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]domain.PokemonCard, error) {
+func GetUserCollection(ctx context.Context, req domain.GetUserCollectionRequest) ([]domain.PokemonCard, error) {
 	rows, err := client.QueryContext(ctx, selectUserCollectionQuery, req.CollectionID, req.UserID)
 	if err != nil {
-		return nil, fmt.Errorf("unable to connect to execute SelectUserCollection query. %v", err.Error())
+		return nil, fmt.Errorf("unable to connect to execute GetUserCollection query %v", err.Error())
 	}
 	defer rows.Close()
 
@@ -20,12 +20,12 @@ func GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]dom
 	for rows.Next() {
 		var cardByte []byte
 		if err := rows.Scan(&cardByte); err != nil {
-			return nil, fmt.Errorf("unable to connect to read rows. %v", err.Error())
+			return nil, fmt.Errorf("unable to connect to read rows %v", err.Error())
 		}
 
 		var pokemonCard PokemonCard
 		if err := json.Unmarshal(cardByte, &pokemonCard); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal JSON. %v", err.Error())
+			return nil, fmt.Errorf("failed to unmarshal JSON %v", err.Error())
 		}
 
 		collection = append(collection, pokemonCard.MapToDomain())

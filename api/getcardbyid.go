@@ -27,7 +27,7 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 
 	if id == "" {
 		slog.ErrorContext(ctx, "no Id provided in query param", "endpoint", endpointName)
-		w.WriteHeader(http.StatusBadRequest) //TODO: Change to 204
+		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte("missing id in request"))
 		if err != nil {
 			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)

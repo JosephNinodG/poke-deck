@@ -8,12 +8,17 @@ import (
 )
 
 type Database interface {
-	GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]domain.PokemonCard, error)
+	GetUserCollection(ctx context.Context, req domain.GetUserCollectionRequest) ([]domain.PokemonCard, error)
+	CreateUserCollection(ctx context.Context, req domain.CreateUserCollectionRequest) error
 }
 
 type DatabaseHandler struct {
 }
 
-func (d DatabaseHandler) GetUserCollection(ctx context.Context, req domain.GetUserCollection) ([]domain.PokemonCard, error) {
+func (d DatabaseHandler) GetUserCollection(ctx context.Context, req domain.GetUserCollectionRequest) ([]domain.PokemonCard, error) {
 	return db.GetUserCollection(ctx, req)
+}
+
+func (d DatabaseHandler) CreateUserCollection(ctx context.Context, req domain.CreateUserCollectionRequest) error {
+	return db.CreateUserCollection(ctx, req)
 }

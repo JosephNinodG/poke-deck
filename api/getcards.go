@@ -40,7 +40,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 	valid, message := req.IsValid()
 	if !valid {
 		slog.ErrorContext(ctx, "request is invalid", "endpoint", endpointName, "request", req)
-		w.WriteHeader(http.StatusBadRequest) //TODO: Change to 204
+		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(message))
 		if err != nil {
 			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)

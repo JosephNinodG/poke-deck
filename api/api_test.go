@@ -127,8 +127,7 @@ func Test_GetCardById(t *testing.T) {
 
 func Test_GetCards(t *testing.T) {
 	tests := []struct {
-		name string
-		//request               model.GetCardsRequest
+		name                  string
 		request               []byte
 		httpMethod            string
 		expectedStatusCode    int
