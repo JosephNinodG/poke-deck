@@ -2,11 +2,14 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	"log"
 	"log/slog"
+	"strconv"
 
 	_ "github.com/lib/pq"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type Connection struct {
@@ -17,21 +20,19 @@ type Connection struct {
 	DbName     string
 }
 
-var client *sql.DB
+var conn *pgx.Conn
 
-func (c *Connection) NewClient(ctx context.Context) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		c.Host, c.Port, c.DbUser, c.DbPassword, c.DbName)
+func (c *Connection) NewConnection(ctx context.Context) {
 
 	var err error
+	databaseConnection := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", c.DbUser, c.DbPassword, c.Host, strconv.Itoa(c.Port), c.DbName)
 
-	client, err = sql.Open("postgres", psqlInfo)
+	conn, err = pgx.Connect(context.Background(), databaseConnection)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 
-	err = client.Ping()
+	err = conn.Ping(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -39,8 +40,8 @@ func (c *Connection) NewClient(ctx context.Context) {
 	slog.InfoContext(ctx, "db connection initialised")
 }
 
-func CloseClient(ctx context.Context) {
-	err := client.Close()
+func CloseConnection(ctx context.Context) {
+	err := conn.Close(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, err.Error())
 		panic(err)
