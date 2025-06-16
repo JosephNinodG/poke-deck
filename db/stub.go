@@ -64,6 +64,23 @@ func (d StubDatabaseHandler) CreateUserCollection(ctx context.Context, req domai
 	return nil
 }
 
+// TODO: Add stubbing for funcs
+func (d StubDatabaseHandler) GetAllCards(ctx context.Context) (map[int]domain.PokemonCard, error) {
+	return nil, nil
+}
+
+func (d StubDatabaseHandler) AddUserCollectionCard(ctx context.Context, cardID, collectionID int) error {
+	return nil
+}
+
+func (d StubDatabaseHandler) GetCardById(ctx context.Context, cardID string) (domain.DbCard, error) {
+	return domain.DbCard{}, nil
+}
+
+func (d StubDatabaseHandler) AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) error {
+	return nil
+}
+
 var stubCollections = []userCollection{
 	{
 		userID: 1,

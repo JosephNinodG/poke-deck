@@ -14,6 +14,7 @@ import (
 	"github.com/JosephNinodG/poke-deck/api"
 	"github.com/JosephNinodG/poke-deck/db"
 	"github.com/JosephNinodG/poke-deck/handler"
+	"github.com/JosephNinodG/poke-deck/lookup"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
@@ -56,6 +57,15 @@ func main() {
 	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey}, handler.DatabaseHandler{})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
+	err := lookup.SetupLookup(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, err.Error())
+		os.Exit(1)
+	}
+
+	done := make(chan bool)
+	lookup.CheckLookupTimes(ctx, done)
+
 	go startHTTPServer(ctx, cancelFunc, appname)
 
 	termChan := make(chan os.Signal, 1)
@@ -65,9 +75,14 @@ func main() {
 	select {
 	case <-termChan:
 		db.CloseConnection(ctx)
+		done <- true
 		cancelFunc()
 	case <-ctx.Done():
 	}
+}
+
+func setup(ctx context.Context) {
+
 }
 
 func startHTTPServer(ctx context.Context, cancelFunc context.CancelFunc, appname string) {

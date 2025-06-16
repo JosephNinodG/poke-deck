@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+
+	"github.com/JosephNinodG/poke-deck/domain"
+	"github.com/JosephNinodG/poke-deck/lookup"
 )
 
 func GetCardById(w http.ResponseWriter, r *http.Request) {
@@ -37,29 +40,36 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "cardId", id)
 
-	response, err := cardHandler.GetCardById(id)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "cardId", id, "error", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if reflect.ValueOf(response).IsZero() {
-		w.WriteHeader(http.StatusNotFound)
-		_, err := w.Write([]byte("no card matching that Id"))
+	var card domain.PokemonCard
+	var err error
+	_, ok := lookup.RecentlyViewedCards[id]
+	if !ok {
+		card, err = cardHandler.GetCardById(id)
 		if err != nil {
-			slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "cardId", id, "error", err)
+			return
 		}
-		return
+
+		w.Header().Set("Content-Type", "application/json")
+		if reflect.ValueOf(card).IsZero() {
+			w.WriteHeader(http.StatusNotFound)
+			_, err := w.Write([]byte("no card matching that Id"))
+			if err != nil {
+				slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
+			}
+			return
+		}
 	}
 
-	err = json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(card)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error encoding response body", "endpoint", endpointName, "error", err)
 		return
 	}
+
+	lookup.UpdateRecentlyViewedCards(nil, card)
 
 	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "cardId", id)
 }

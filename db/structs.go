@@ -1,7 +1,8 @@
 package db
 
 type PokemonCard struct {
-	ID                     string     `json:"id"`
+	ID                     int        `json:"id"`
+	CardID                 string     `json:"cardID"`
 	Name                   string     `json:"name"`
 	Supertype              string     `json:"supertype"`
 	Subtypes               []string   `json:"subtypes"`

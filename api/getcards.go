@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/JosephNinodG/poke-deck/domain"
+	"github.com/JosephNinodG/poke-deck/lookup"
 )
 
 func GetCards(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +64,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 		Paramters: domain.Parameters(req.Paramters),
 	}
 
-	response, err := cardHandler.GetCards(getCardRequest)
+	cards, err := cardHandler.GetCards(getCardRequest)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error getting specified card", "endpoint", endpointName, "request", req, "error", err)
@@ -71,11 +72,15 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(cards)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error encoding response body", "endpoint", endpointName, "error", err)
 		return
+	}
+
+	for _, card := range cards {
+		lookup.UpdateRecentlyViewedCards(nil, card)
 	}
 
 	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "request", req)

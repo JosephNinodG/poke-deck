@@ -2,6 +2,15 @@ package api
 
 import "reflect"
 
+type AddUserCollectionCardRequest struct {
+	CollectionID int    `json:"collectionId"`
+	CardID       string `json:"cardId"`
+}
+
+func (r *AddUserCollectionCardRequest) IsValid() bool {
+	return r.CollectionID > 0 && r.CardID > ""
+}
+
 type CreateUserCollectionRequest struct {
 	UserID         int    `json:"userId"`
 	CollectionName string `json:"collectionName"`

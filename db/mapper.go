@@ -4,7 +4,7 @@ import "github.com/JosephNinodG/poke-deck/domain"
 
 func (p *PokemonCard) MapToDomain() domain.PokemonCard {
 	var pokemonCard = domain.PokemonCard{
-		ID:                     p.ID,
+		ID:                     p.CardID,
 		Name:                   p.Name,
 		Supertype:              p.Supertype,
 		Subtypes:               p.Subtypes,
