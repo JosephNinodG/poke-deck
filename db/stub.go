@@ -77,8 +77,8 @@ func (d StubDatabaseHandler) GetCardById(ctx context.Context, cardID string) (do
 	return domain.DbCard{}, nil
 }
 
-func (d StubDatabaseHandler) AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) error {
-	return nil
+func (d StubDatabaseHandler) AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) (int, error) {
+	return 0, nil
 }
 
 var stubCollections = []userCollection{

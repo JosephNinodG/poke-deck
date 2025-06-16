@@ -90,9 +90,24 @@ func AddUserCollectionCard(w http.ResponseWriter, r *http.Request) {
 		setLegalities := lookup.MapLegality(card.Set.Legalities)
 		cardLegalities := lookup.MapLegality(card.Legalities)
 
-		err = databaseHandler.AddCard(ctx, setLegalities, cardLegalities, card)
+		dbCardID, err = databaseHandler.AddCard(ctx, setLegalities, cardLegalities, card)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			_, err := w.Write([]byte("error adding card to card table"))
+			if err != nil {
+				slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
+			}
+			return
+		}
 
-		//TODO: Return newly added cardID from DB and assign to dbCardID
+		if reflect.ValueOf(dbCardID).IsZero() {
+			w.WriteHeader(http.StatusNotFound)
+			_, err := w.Write([]byte("error getting db ID of newly added card"))
+			if err != nil {
+				slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
+			}
+			return
+		}
 
 	} else {
 		dbCardID = dbCard.ID

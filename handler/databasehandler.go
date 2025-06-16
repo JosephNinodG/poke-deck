@@ -13,7 +13,7 @@ type Database interface {
 	GetAllCards(ctx context.Context) (map[int]domain.PokemonCard, error)
 	AddUserCollectionCard(ctx context.Context, cardID, collectionID int) error
 	GetCardById(ctx context.Context, cardID string) (domain.DbCard, error)
-	AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) error
+	AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) (int, error)
 }
 
 type DatabaseHandler struct {
@@ -39,6 +39,6 @@ func (d DatabaseHandler) GetCardById(ctx context.Context, cardID string) (domain
 	return db.GetCardById(ctx, cardID)
 }
 
-func (d DatabaseHandler) AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) error {
+func (d DatabaseHandler) AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) (int, error) {
 	return db.AddCard(ctx, setLegalities, cardLegalities, card)
 }

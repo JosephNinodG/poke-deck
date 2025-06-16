@@ -8,12 +8,9 @@ import (
 	"github.com/JosephNinodG/poke-deck/domain"
 )
 
-//TODO: Return newly added db ID of card
-
-func AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) error {
-
-	//TODO: Change from Exec to get ID
-	result, err := conn.Exec(ctx, addCardQuery,
+func AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) (int, error) {
+	var dbCardID int
+	err := conn.QueryRow(ctx, addCardQuery,
 		card.Set.Images.Symbol, card.Set.Images.Logo,
 		card.Set.Name, card.Set.Series, card.Set.PrintedTotal, card.Set.Total, card.Set.PtcgoCode, card.Set.ReleaseDate, card.Set.UpdatedAt, setLegalities,
 		card.Images.Small, card.Images.Large,
@@ -22,20 +19,14 @@ func AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain
 		card.EvolvesFrom, card.EvolvesTo, card.Rules, card.RetreatCost, card.ConvertedRetreatCost,
 		card.Number, card.Artist, card.Rarity, card.FlavorText, card.NationalPokedexNumbers,
 		cardLegalities,
-	)
+	).Scan(&dbCardID)
 	if err != nil {
-		return fmt.Errorf("unable to connect to execute AddUserCollectionCard query. %v", err.Error())
-	}
-
-	rows := result.RowsAffected()
-
-	if rows != 1 {
-		return fmt.Errorf("expected single row affected, got %d rows affected", rows)
+		return dbCardID, fmt.Errorf("unable execute QueryRow for AddCard. %v", err.Error())
 	}
 
 	slog.DebugContext(ctx, "card added to database successfully", "CardID", card.ID)
 
-	return nil
+	return dbCardID, nil
 }
 
 // TODO: Add other queries for attack, ability, resistance, and weakness arrays.
@@ -100,5 +91,5 @@ var addCardQuery = `
 		FROM get_ancient_trait, get_set, get_card_images
 		RETURNING id
 	)
-	SELECT 'Insert completed';
+	SELECT id FROM ins_card;
 	`
