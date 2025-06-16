@@ -57,6 +57,7 @@ func main() {
 	api.Configure(handler.TcgApiHandler{Apikey: tcgapikey}, handler.DatabaseHandler{})
 	tcgapi.SetUpClient(ctx, tcgapikey)
 
+	lookup.Configure(handler.TcgApiHandler{Apikey: tcgapikey}, handler.DatabaseHandler{})
 	err := lookup.SetupLookup(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, err.Error())
