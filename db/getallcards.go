@@ -10,13 +10,13 @@ import (
 )
 
 func GetAllCards(ctx context.Context) (map[int]domain.PokemonCard, error) {
-	rows, err := conn.Query(ctx, selectUserCollectionQuery)
+	rows, err := conn.Query(ctx, selectAllCardsInDbQuery)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to execute GetAllCards query %v", err.Error())
 	}
 	defer rows.Close()
 
-	var cards map[int]domain.PokemonCard
+	var cards = make(map[int]domain.PokemonCard)
 	for rows.Next() {
 		var cardByte []byte
 		if err := rows.Scan(&cardByte); err != nil {

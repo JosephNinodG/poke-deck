@@ -49,7 +49,7 @@ func (d StubDatabaseHandler) GetUserCollection(ctx context.Context, req domain.G
 func (d StubDatabaseHandler) CreateUserCollection(ctx context.Context, req domain.CreateUserCollectionRequest) error {
 	var currentHighestKey int
 
-	for k, _ := range stubRepo.collections {
+	for k := range stubRepo.collections {
 		if k > currentHighestKey {
 			currentHighestKey = k
 		}

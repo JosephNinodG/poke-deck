@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"reflect"
 	"strings"
 
-	"github.com/JosephNinodG/poke-deck/db"
 	"github.com/JosephNinodG/poke-deck/domain"
-	"github.com/JosephNinodG/poke-deck/lookup"
+	"github.com/JosephNinodG/poke-deck/service"
 )
 
 func AddUserCollectionCard(w http.ResponseWriter, r *http.Request) {
@@ -54,66 +52,7 @@ func AddUserCollectionCard(w http.ResponseWriter, r *http.Request) {
 
 	slog.InfoContext(ctx, "request received", "endpoint", endpointName, "request", req)
 
-	var dbCardID int
-	dbCard, err := db.GetCardById(ctx, req.CardID)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "error getting specified card from db", "endpoint", endpointName, "cardId", req.CardID, "error", err)
-		return
-	}
-
-	if reflect.ValueOf(dbCard).IsZero() {
-		var card domain.PokemonCard
-		recentlyViewedCard, ok := lookup.RecentlyViewedCards[req.CardID]
-		if !ok {
-			card, err = cardHandler.GetCardById(req.CardID)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				slog.ErrorContext(ctx, "error getting specified card from tcgapi", "endpoint", endpointName, "cardId", req.CardID, "error", err)
-				return
-			}
-
-			w.Header().Set("Content-Type", "application/json")
-			if reflect.ValueOf(card).IsZero() {
-				w.WriteHeader(http.StatusNotFound)
-				_, err := w.Write([]byte("no card matching that Id"))
-				if err != nil {
-					slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
-				}
-				return
-			}
-
-		} else {
-			card = recentlyViewedCard.Card
-		}
-
-		setLegalities := lookup.MapLegality(card.Set.Legalities)
-		cardLegalities := lookup.MapLegality(card.Legalities)
-
-		dbCardID, err = databaseHandler.AddCard(ctx, setLegalities, cardLegalities, card)
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			_, err := w.Write([]byte("error adding card to card table"))
-			if err != nil {
-				slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
-			}
-			return
-		}
-
-		if reflect.ValueOf(dbCardID).IsZero() {
-			w.WriteHeader(http.StatusNotFound)
-			_, err := w.Write([]byte("error getting db ID of newly added card"))
-			if err != nil {
-				slog.ErrorContext(ctx, "error writing to HTTP response body", "endpoint", endpointName, "error", err)
-			}
-			return
-		}
-
-	} else {
-		dbCardID = dbCard.ID
-	}
-
-	err = databaseHandler.AddUserCollectionCard(ctx, dbCardID, req.CollectionID)
+	err = service.AddUserCollectionCard(ctx, req.CardID, req.CollectionID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "error adding specified card to collection", "endpoint", endpointName, "cardId", req.CardID, "collectionId", req.CollectionID, "error", err)
@@ -126,8 +65,6 @@ func AddUserCollectionCard(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "error encoding response body", "endpoint", endpointName, "error", err)
 		return
 	}
-
-	lookup.UpdateRecentlyViewedCards(nil, card)
 
 	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "cardId", card.ID)
 }
