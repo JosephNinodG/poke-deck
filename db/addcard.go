@@ -21,12 +21,184 @@ func AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain
 		cardLegalities,
 	).Scan(&dbCardID)
 	if err != nil {
-		return dbCardID, fmt.Errorf("unable execute QueryRow for AddCard. %v", err.Error())
+		return dbCardID, fmt.Errorf("unable to execute QueryRow for AddCard. %v", err.Error())
+	}
+
+	for _, ability := range card.Abilities {
+		err = addCardAbility(ctx, dbCardID, ability)
+		if err != nil {
+			return dbCardID, err
+		}
+	}
+
+	for _, attack := range card.Attacks {
+		err = addCardAttack(ctx, dbCardID, attack)
+		if err != nil {
+			return dbCardID, err
+		}
+	}
+
+	for _, resistance := range card.Resistances {
+		err = addCardResisitance(ctx, dbCardID, resistance)
+		if err != nil {
+			return dbCardID, err
+		}
+	}
+
+	for _, weakness := range card.Weaknesses {
+		err = addCardWeakness(ctx, dbCardID, weakness)
+		if err != nil {
+			return dbCardID, err
+		}
 	}
 
 	slog.DebugContext(ctx, "card added to database successfully", "CardID", card.ID)
 
 	return dbCardID, nil
+}
+
+func addCardAbility(ctx context.Context, dbCardID int, ability *domain.Traits) error {
+	var addCardAbilityQuery = `
+		ins_ability AS (
+		INSERT INTO ability("name", "description", "type")
+		VALUES ($1, $2, $3)
+		ON CONFLICT DO NOTHING
+		RETURNING id
+		), get_ability AS (
+		SELECT id FROM ins_ability
+		UNION
+		SELECT id FROM ability WHERE "name" = $1
+		),
+
+		card_ability_link AS (
+		INSERT INTO card_ability(card_id, ability_id)
+		SELECT $4, get_ability.id FROM $4, get_ability
+		ON CONFLICT DO NOTHING
+		),
+
+		SELECT 'Card and related data inserted successfully.';
+	`
+
+	result, err := conn.Exec(ctx, addCardAbilityQuery, &ability.Name, &ability.Description, &ability.Type, dbCardID)
+	if err != nil {
+		return fmt.Errorf("unable to connect to execute addCardAbility query. %v", err.Error())
+	}
+
+	rows := result.RowsAffected()
+
+	if rows != 1 {
+		return fmt.Errorf("expected single row affected, got %d rows affected", rows)
+	}
+
+	return nil
+}
+
+func addCardAttack(ctx context.Context, dbCardID int, attack domain.Attack) error {
+	var addCardAttackQuery = `
+	ins_attack AS (
+	INSERT INTO attack("name", "cost", "convertedEnergyCost", "damage", "description")
+	VALUES ($1, $2, $3, $4, $5)
+	ON CONFLICT DO NOTHING
+	RETURNING id
+	), get_attack AS (
+	SELECT id FROM ins_attack
+	UNION
+	SELECT id FROM attack WHERE "name" = $1
+	),
+
+	card_attack_link AS (
+	INSERT INTO card_attack(card_id, attack_id)
+	SELECT $6, get_attack.id FROM $6, get_attack
+	ON CONFLICT DO NOTHING
+	)
+
+	SELECT 'Card and related data inserted successfully.';
+	`
+
+	result, err := conn.Exec(ctx, addCardAttackQuery, attack.Name, attack.Cost, attack.ConvertedEnergyCost, attack.Damage, attack.Description, dbCardID)
+	if err != nil {
+		return fmt.Errorf("unable to connect to execute addCardAttack query. %v", err.Error())
+	}
+
+	rows := result.RowsAffected()
+
+	if rows != 1 {
+		return fmt.Errorf("expected single row affected, got %d rows affected", rows)
+	}
+
+	return nil
+}
+
+func addCardResisitance(ctx context.Context, dbCardID int, resistance domain.Traits) error {
+	var addCardResisitanceQuery = `
+	ins_resistance AS (
+	INSERT INTO resistance("type", "value")
+	VALUES ($1, $2)
+	ON CONFLICT DO NOTHING
+	RETURNING id
+	), get_resistance AS (
+	SELECT id FROM ins_resistance
+	UNION
+	SELECT id FROM resistance WHERE "type" = $1 AND "value" = $2
+	),
+
+	card_resistance_link AS (
+	INSERT INTO card_resistance(card_id, resistance_id)
+	SELECT $3, get_resistance.id FROM $3, get_resistance
+	ON CONFLICT DO NOTHING
+	)
+
+	SELECT 'Card and related data inserted successfully.';
+	`
+
+	result, err := conn.Exec(ctx, addCardResisitanceQuery, resistance.Type, resistance.Value, dbCardID)
+	if err != nil {
+		return fmt.Errorf("unable to connect to execute addCardResisitance query. %v", err.Error())
+	}
+
+	rows := result.RowsAffected()
+
+	if rows != 1 {
+		return fmt.Errorf("expected single row affected, got %d rows affected", rows)
+	}
+
+	return nil
+}
+
+func addCardWeakness(ctx context.Context, dbCardID int, weakness domain.Traits) error {
+	var addCardWeaknessQuery = `
+	ins_weakness AS (
+	INSERT INTO weakness("type", "value")
+	VALUES ($1, $2)
+	ON CONFLICT DO NOTHING
+	RETURNING id
+	), get_weakness AS (
+	SELECT id FROM ins_weakness
+	UNION
+	SELECT id FROM weakness WHERE "type" = $1 AND "value" = $2
+	),
+
+	card_weakness_link AS (
+	INSERT INTO card_weakness(card_id, weakness_id)
+	SELECT $3, get_weakness.id FROM $3, get_weakness
+	ON CONFLICT DO NOTHING
+	),
+
+	SELECT 'Card and related data inserted successfully.';
+	`
+
+	result, err := conn.Exec(ctx, addCardWeaknessQuery, weakness.Type, weakness.Value, dbCardID)
+	if err != nil {
+		return fmt.Errorf("unable to connect to execute addCardWeakness query. %v", err.Error())
+	}
+
+	rows := result.RowsAffected()
+
+	if rows != 1 {
+		return fmt.Errorf("expected single row affected, got %d rows affected", rows)
+	}
+
+	return nil
 }
 
 // TODO: Add other queries for attack, ability, resistance, and weakness arrays.
