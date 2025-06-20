@@ -47,6 +47,8 @@ func updateViewedTime(cardId string) {
 }
 
 func SetupLookup(ctx context.Context) error {
+	RecentlyViewedCards = make(map[string]RecentlyViewedCard)
+
 	cards, err := databaseHandler.GetAllCards(ctx)
 	if err != nil {
 		return err
