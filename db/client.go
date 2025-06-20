@@ -27,7 +27,7 @@ func (c *Connection) NewConnection(ctx context.Context) {
 	var err error
 	databaseConnection := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", c.DbUser, c.DbPassword, c.Host, strconv.Itoa(c.Port), c.DbName)
 
-	conn, err = pgx.Connect(context.Background(), databaseConnection)
+	conn, err = pgx.Connect(ctx, databaseConnection)
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}

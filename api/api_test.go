@@ -6,13 +6,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 
 	"github.com/JosephNinodG/poke-deck/db"
 	"github.com/JosephNinodG/poke-deck/domain"
+	"github.com/JosephNinodG/poke-deck/lookup"
 	"github.com/JosephNinodG/poke-deck/tcgapi"
 )
 
@@ -23,6 +26,13 @@ func TestMain(m *testing.M) {
 	Configure(tcgapi.StubTcgApiHandler{}, db.StubDatabaseHandler{})
 
 	tcgapi.SetUpStubRepository(ctx, tcgapikey)
+
+	lookup.Configure(db.StubDatabaseHandler{})
+	err := lookup.SetupLookup(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, err.Error())
+		os.Exit(1)
+	}
 
 	m.Run()
 }
