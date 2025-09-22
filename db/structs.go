@@ -58,7 +58,8 @@ type Attack struct {
 }
 
 type Set struct {
-	ID           string     `json:"id"`
+	ID           int        `json:"id"`
+	SetID        string     `json:"setID"`
 	Name         string     `json:"name"`
 	Series       string     `json:"series"`
 	PrintedTotal int        `json:"printedTotal"`

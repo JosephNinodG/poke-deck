@@ -9,18 +9,17 @@ import (
 )
 
 type RecentlyViewedCard struct {
-	DatabaseId *int
 	Card       domain.PokemonCard
 	TimeViewed time.Time
 }
 
 var RecentlyViewedCards map[string]RecentlyViewedCard
 
-func UpdateRecentlyViewedCards(databaseId *int, card domain.PokemonCard) {
-	if isInRecentlyViewedCards(card.ID) {
-		updateViewedTime(card.ID)
+func UpdateRecentlyViewedCards(card domain.PokemonCard) {
+	if isInRecentlyViewedCards(card.CardID) {
+		updateViewedTime(card.CardID)
 	} else {
-		addToRecentlyViewedCards(databaseId, card)
+		addToRecentlyViewedCards(card)
 	}
 }
 
@@ -29,15 +28,14 @@ func isInRecentlyViewedCards(cardId string) bool {
 	return ok
 }
 
-func addToRecentlyViewedCards(databaseId *int, card domain.PokemonCard) {
+func addToRecentlyViewedCards(card domain.PokemonCard) {
 
 	var recentlyViewedCard = RecentlyViewedCard{
-		DatabaseId: databaseId,
 		Card:       card,
 		TimeViewed: time.Now(),
 	}
 
-	RecentlyViewedCards[card.ID] = recentlyViewedCard
+	RecentlyViewedCards[card.CardID] = recentlyViewedCard
 }
 
 func updateViewedTime(cardId string) {
@@ -56,13 +54,12 @@ func SetupLookup(ctx context.Context) error {
 
 	setupTime := time.Now()
 
-	for databaseId, card := range cards {
+	for _, card := range cards {
 		var recentlyViewedCard = RecentlyViewedCard{
-			DatabaseId: &databaseId,
 			Card:       card,
 			TimeViewed: setupTime,
 		}
-		RecentlyViewedCards[card.ID] = recentlyViewedCard
+		RecentlyViewedCards[card.CardID] = recentlyViewedCard
 	}
 
 	return nil

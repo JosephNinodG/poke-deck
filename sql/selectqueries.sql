@@ -1,6 +1,7 @@
 -- GET ALL CARD INFORMATION
 SELECT
 		card.id,
+    card.cardID
 		card.name,
     card.supertype,
   	card.subtypes,
@@ -31,6 +32,7 @@ SELECT
         'description', ancient_trait.description
     ) AS ancient_trait,
     jsonb_build_object(
+      'setID', "set"."setID"
       'name', "set".name,
       'series', "set".series,
       'printedTotal', "set"."printedTotal",
@@ -119,16 +121,17 @@ LEFT JOIN
 LEFT JOIN
 		resistance ON card_resistance.resistance_id = resistance.id  
 GROUP BY
-		card.id, card.name, 
+		card.id, card.cardID, card.name, 
     card_legalities.standard, card_legalities.expanded, card_legalities.unlimited, 
     card_images.small, card_images.large, 
     ancient_trait.name, ancient_trait.description,
-    "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
+    "set".setID, "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
     set_legalities.standard, set_legalities.expanded, set_legalities.unlimited,
     set_images.logo, set_images.logo
 
 -- Get all the cards in collection x for user y
 SELECT
+    card.Id,
 		card.cardID,
 		card.name,
     card.supertype,
@@ -160,7 +163,8 @@ SELECT
         'description', ancient_trait.description
     ) AS ancient_trait,
     jsonb_build_object(
-      'name', "set".name,
+      'setID', "set"."setID",
+      'name', "set"."name",
       'series', "set".series,
       'printedTotal', "set"."printedTotal",
       'total', "set".total,
@@ -256,18 +260,19 @@ LEFT JOIN
 WHERE
 		collection.id = 1 AND "user".id = 1 --REPLACE values of 1 with vars
 GROUP BY
-		card.id, card.name, 
+		card.id, card.cardID, card.name, 
     card_legalities.standard, card_legalities.expanded, card_legalities.unlimited, 
     card_images.small, card_images.large, 
     ancient_trait.name, ancient_trait.description,
-    "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
+    "set".setID, "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
     set_legalities.standard, set_legalities.expanded, set_legalities.unlimited,
     set_images.logo, set_images.logo
 
 -- Get all the cards in collection x for user y as a JSON object
 SELECT
 	jsonb_build_object(
-  	'id', card."cardID",
+    'ID', card."Id",
+  	'cardID', card."cardID",
 		'name', card.name,
     'supertype', card.supertype,
   	'subtypes', card.subtypes,
@@ -298,6 +303,7 @@ SELECT
         'description', ancient_trait.description
     ),
     'set', jsonb_build_object(
+      'setID', "set".setID,
       'name', "set".name,
       'series', "set".series,
       'printedTotal', "set"."printedTotal",
@@ -395,10 +401,10 @@ LEFT JOIN
 WHERE
 		collection.id = 1 AND "user".id = 1 
 GROUP BY
-		card.id, card.name, 
+		card.id, card.cardID, card.name, 
     card_legalities.standard, card_legalities.expanded, card_legalities.unlimited, 
     card_images.small, card_images.large, 
     ancient_trait.name, ancient_trait.description,
-    "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
+    "set".setID, "set".name, "set".series, "set"."printedTotal", "set".total, "set"."ptcgoCode", "set"."releaseDate",  "set"."updatedAt",
     set_legalities.standard, set_legalities.expanded, set_legalities.unlimited,
     set_images.logo, set_images.logo

@@ -69,7 +69,7 @@ func GetCardById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lookup.UpdateRecentlyViewedCards(nil, card)
+	lookup.UpdateRecentlyViewedCards(card)
 
 	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "cardId", id)
 }

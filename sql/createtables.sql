@@ -66,6 +66,7 @@ create table "user"(
 
 create table "set"(
  id serial primary key,
+ "setID" varchar(50) NOT NULL,
  "name"	varchar(200) NOT NULL,
  "series" varchar(50) NOT NULL,
   "printedTotal" integer NOT NULL,
@@ -174,8 +175,8 @@ values ('Fighting', '+20'), ('Water', 'x2');
 insert into "resistance" ("type", "value")
 values ('Metal', '-20');
 
-insert into "set" ("name", "series", "printedTotal", "total", "ptcgoCode", "releaseDate", "updatedAt", "set_legalities_id", "set_images_id")
-values ('set1','series1',100,150,'s1','2025/01/01','2025/01/01',1,1),
+insert into "set" ("setID", "name", "series", "printedTotal", "total", "ptcgoCode", "releaseDate", "updatedAt", "set_legalities_id", "set_images_id")
+values ('s1','set1','series1',100,150,'s1','2025/01/01','2025/01/01',1,1),
 ('set2','series2',100,150,'s2','2024/01/01','2024/01/01',1,2);
 
 insert into "card" ("cardID", "name","supertype","subtypes","level","hp","types","evolvesFrom","evolvesTo","rules","retreatCost","convertedRetreatCost","number","artist","rarity","flavorText","nationalPokedexNumbers","ancient_trait_id","set_id","card_legalities_id","card_images_id")

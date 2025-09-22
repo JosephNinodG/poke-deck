@@ -1,7 +1,8 @@
 package domain
 
 type PokemonCard struct {
-	ID                     string
+	ID                     *int
+	CardID                 string
 	Name                   string
 	Supertype              string
 	Subtypes               []string
@@ -57,7 +58,8 @@ type Attack struct {
 }
 
 type Set struct {
-	ID           string
+	ID           *int
+	SetID        string
 	Name         string
 	Series       string
 	PrintedTotal int

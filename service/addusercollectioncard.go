@@ -21,29 +21,30 @@ func AddUserCollectionCard(ctx context.Context, cardID string, collectionID int)
 		}
 
 		if reflect.ValueOf(dbCard).IsZero() {
-			var card domain.PokemonCard
-			card, err = cardHandler.GetCardById(cardID)
+			var apiCard domain.PokemonCard
+			apiCard, err = cardHandler.GetCardById(cardID)
 			if err != nil {
 				return err
 			}
 
-			setLegalities := lookup.MapLegality(card.Set.Legalities)
-			cardLegalities := lookup.MapLegality(card.Legalities)
+			setLegalities := lookup.MapLegality(apiCard.Set.Legalities)
+			cardLegalities := lookup.MapLegality(apiCard.Legalities)
 
-			dbCardID, err = databaseHandler.AddCard(ctx, setLegalities, cardLegalities, card)
+			dbCardID, err = databaseHandler.AddCard(ctx, setLegalities, cardLegalities, apiCard)
 			if err != nil {
 				return err
 			}
 
-			lookup.UpdateRecentlyViewedCards(&dbCardID, card)
+			apiCard.ID = &dbCardID
+
+			lookup.UpdateRecentlyViewedCards(apiCard)
 
 		} else {
-			dbCardID = dbCard.ID
 
-			lookup.UpdateRecentlyViewedCards(&dbCardID, dbCard.Card)
+			lookup.UpdateRecentlyViewedCards(dbCard)
 		}
 
-	} else if recentlyViewedCard.DatabaseId == nil {
+	} else if recentlyViewedCard.Card.ID == nil {
 		dbCard, err := db.GetCardById(ctx, cardID)
 		if err != nil {
 			return err
@@ -59,18 +60,20 @@ func AddUserCollectionCard(ctx context.Context, cardID string, collectionID int)
 				return err
 			}
 
-			lookup.UpdateRecentlyViewedCards(&dbCardID, recentlyViewedCard.Card)
+			recentlyViewedCard.Card.ID = &dbCardID
+
+			lookup.UpdateRecentlyViewedCards(recentlyViewedCard.Card)
 
 		} else {
-			dbCardID = dbCard.ID
 
-			lookup.UpdateRecentlyViewedCards(&dbCardID, dbCard.Card)
+			lookup.UpdateRecentlyViewedCards(dbCard)
 		}
 
 	} else {
-		dbCardID = *recentlyViewedCard.DatabaseId
 
-		lookup.UpdateRecentlyViewedCards(&dbCardID, recentlyViewedCard.Card)
+		dbCardID = *recentlyViewedCard.Card.ID
+
+		lookup.UpdateRecentlyViewedCards(recentlyViewedCard.Card)
 	}
 
 	return databaseHandler.AddUserCollectionCard(ctx, dbCardID, collectionID)

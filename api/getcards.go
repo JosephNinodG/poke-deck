@@ -80,7 +80,7 @@ func GetCards(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, card := range cards {
-		lookup.UpdateRecentlyViewedCards(nil, card)
+		lookup.UpdateRecentlyViewedCards(card)
 	}
 
 	slog.InfoContext(ctx, "response returned successfully", "endpoint", endpointName, "request", req)

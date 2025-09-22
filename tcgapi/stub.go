@@ -24,7 +24,7 @@ func SetUpStubRepository(ctx context.Context, apikey string) {
 
 func (t StubTcgApiHandler) GetCardById(id string) (domain.PokemonCard, error) {
 	for _, card := range stubRepo.cards {
-		if card.ID == id {
+		if card.CardID == id {
 			return card, nil
 		}
 	}
@@ -141,7 +141,7 @@ func IsValidCard(req domain.GetCardsRequest, card domain.PokemonCard) bool {
 
 var stubPokemonCards = []domain.PokemonCard{
 	{
-		ID:        "test-ID-1",
+		CardID:    "test-ID-1",
 		Name:      "test-name-1",
 		Supertype: "test-supertype",
 		Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
@@ -151,7 +151,7 @@ var stubPokemonCards = []domain.PokemonCard{
 		Number:    "100",
 	},
 	{
-		ID:        "test-ID-2",
+		CardID:    "test-ID-2",
 		Name:      "test-name-2",
 		Supertype: "test-supertype",
 		Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
@@ -161,7 +161,7 @@ var stubPokemonCards = []domain.PokemonCard{
 		Number:    "50",
 	},
 	{
-		ID:        "test-ID-3",
+		CardID:    "test-ID-3",
 		Name:      "test-name-3",
 		Supertype: "test-supertype",
 		Subtypes:  []string{"test-subtype-2", "test-subtype-3"},

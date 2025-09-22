@@ -7,7 +7,7 @@ import (
 
 func MapToDomain(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 	var pokemonCard = domain.PokemonCard{
-		ID:                     apiCard.ID,
+		CardID:                 apiCard.ID,
 		Name:                   apiCard.Name,
 		Supertype:              apiCard.Supertype,
 		Subtypes:               apiCard.Subtypes,
@@ -75,7 +75,7 @@ func MapToDomain(apiCard pokemontcgv2.PokemonCard) domain.PokemonCard {
 	}
 
 	pokemonCard.Set = domain.Set{
-		ID:          apiCard.Set.ID,
+		SetID:       apiCard.Set.ID,
 		Name:        apiCard.Set.Name,
 		Series:      apiCard.Set.Series,
 		PtcgoCode:   apiCard.Set.PtcgoCode,

@@ -9,8 +9,3 @@ type CreateUserCollectionRequest struct {
 	UserID         int
 	CollectionName string
 }
-
-type DbCard struct {
-	ID   int
-	Card PokemonCard
-}

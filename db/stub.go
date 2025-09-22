@@ -65,7 +65,7 @@ func (d StubDatabaseHandler) CreateUserCollection(ctx context.Context, req domai
 }
 
 // TODO: Add stubbing for funcs
-func (d StubDatabaseHandler) GetAllCards(ctx context.Context) (map[int]domain.PokemonCard, error) {
+func (d StubDatabaseHandler) GetAllCards(ctx context.Context) ([]domain.PokemonCard, error) {
 	return nil, nil
 }
 
@@ -73,12 +73,16 @@ func (d StubDatabaseHandler) AddUserCollectionCard(ctx context.Context, cardID, 
 	return nil
 }
 
-func (d StubDatabaseHandler) GetCardById(ctx context.Context, cardID string) (domain.DbCard, error) {
-	return domain.DbCard{}, nil
+func (d StubDatabaseHandler) GetCardById(ctx context.Context, cardID string) (domain.PokemonCard, error) {
+	return domain.PokemonCard{}, nil
 }
 
 func (d StubDatabaseHandler) AddCard(ctx context.Context, setLegalities, cardLegalities int, card domain.PokemonCard) (int, error) {
 	return 0, nil
+}
+
+func intPtr(i int) *int {
+	return &i
 }
 
 var stubCollections = []userCollection{
@@ -89,7 +93,8 @@ var stubCollections = []userCollection{
 				collectionName: "test-user1-collection1",
 				collectionCards: []domain.PokemonCard{
 					{
-						ID:        "test-ID-1",
+						ID:        intPtr(1),
+						CardID:    "test-ID-1",
 						Name:      "test-name-1",
 						Supertype: "test-supertype",
 						Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
@@ -99,7 +104,8 @@ var stubCollections = []userCollection{
 						Number:    "100",
 					},
 					{
-						ID:        "test-ID-2",
+						ID:        intPtr(2),
+						CardID:    "test-ID-2",
 						Name:      "test-name-2",
 						Supertype: "test-supertype",
 						Subtypes:  []string{"test-subtype-1", "test-subtype-2"},
@@ -109,7 +115,8 @@ var stubCollections = []userCollection{
 						Number:    "50",
 					},
 					{
-						ID:        "test-ID-3",
+						ID:        intPtr(3),
+						CardID:    "test-ID-3",
 						Name:      "test-name-3",
 						Supertype: "test-supertype",
 						Subtypes:  []string{"test-subtype-2", "test-subtype-3"},
